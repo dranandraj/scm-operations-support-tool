@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Support Requests{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Support Requests</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Request ID</th>
+            <th>Issue Type</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Created Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for request in support_requests %}
+        <tr>
+            <td>{{ request[0] }}</td>
+            <td>{{ request[1] }}</td>
+            <td>{{ request[2] }}</td>
+            <td>{{ request[3] }}</td>
+            <td>{{ request[4] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

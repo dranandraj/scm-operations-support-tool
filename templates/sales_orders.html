@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Orders{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Sales Orders</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Sales Order ID</th>
+            <th>Customer ID</th>
+            <th>Material ID</th>
+            <th>Quantity</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for order in sales_orders %}
+        <tr>
+            <td>{{ order[0] }}</td>
+            <td>{{ order[1] }}</td>
+            <td>{{ order[2] }}</td>
+            <td>{{ order[3] }}</td>
+            <td>{{ order[4] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

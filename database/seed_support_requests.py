@@ -5,9 +5,10 @@ random.seed(42)
 
 connection = psycopg2.connect(
     host="localhost",
-    port="5433",
+    port="5432",
     database="scm_support_db",
-    user="postgres"
+    user="postgres",
+    password="6978"
 )
 
 cursor = connection.cursor()
@@ -16,7 +17,7 @@ cursor = connection.cursor()
 # support_requests
 # -----------------------------------
 
-for i in range(1, 50):
+for i in range(1, 51):
     request_id = f"REQ{i:03}"
     issue_type = random.choice([
     "Order Error",

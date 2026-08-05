@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Materials{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Materials</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Material ID</th>
+            <th>Material Name</th>
+            <th>Category</th>
+            <th>Plant</th>
+            <th>Price</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for material in materials %}
+        <tr>
+            <td>{{ material[0] }}</td>
+            <td>{{ material[1] }}</td>
+            <td>{{ material[2] }}</td>
+            <td>{{ material[3] }}</td>
+            <td>{{ material[4] }}</td>
+            <td>{{ material[5] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

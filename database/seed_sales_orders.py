@@ -5,9 +5,10 @@ random.seed(42)
 
 connection = psycopg2.connect(
     host="localhost",
-    port="5433",
+    port="5432",
     database="scm_support_db",
-    user="postgres"
+    user="postgres",
+    password="6978"
 )
 
 cursor = connection.cursor()
