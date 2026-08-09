@@ -4,49 +4,569 @@
 
 {% block content %}
 
-<h2 class="mb-4">Support Requests</h2>
+<style>
 
-<form method="GET" action="/support_requests" class="mb-4">
-    <div class="input-group">
+    .page-title {
+        margin-bottom: 25px;
+    }
+
+    .filter-form {
+        margin-bottom: 25px;
+    }
+
+    .filter-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filter-row input,
+    .filter-row select {
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+        background: white;
+    }
+
+    .filter-row input {
+        width: 380px;
+    }
+
+    .filter-row select {
+        min-width: 150px;
+    }
+
+    .button-row {
+        margin-top: 15px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .button-row button,
+    .reset-button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .button-row button {
+        background: #212529;
+        color: white;
+    }
+
+    .reset-button {
+        background: #6c757d;
+        color: white;
+    }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .support-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    .support-table th {
+        background: #212529;
+        color: white;
+        padding: 14px 12px;
+        text-align: left;
+        font-size: 17px;
+    }
+
+    .support-table th a {
+        color: white;
+        text-decoration: none;
+        display: block;
+    }
+
+    .support-table th a:hover {
+        text-decoration: underline;
+    }
+
+    .support-table td {
+        padding: 13px 12px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+    }
+
+    .support-table tbody tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+
+    .support-table tbody tr:hover {
+        background: #f1f3f5;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 20px !important;
+    }
+
+    /* Pagination */
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        text-decoration: none;
+        font-size: 16px;
+        background: white;
+        color: #0d6efd;
+    }
+
+    .pagination a:hover {
+        background: #f1f3f5;
+    }
+
+    .pagination .active {
+        background: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+
+    .pagination .disabled {
+        color: #999;
+        background: #f1f3f5;
+        cursor: not-allowed;
+    }
+
+</style>
+
+
+<h1 class="page-title">Support Requests</h1>
+
+
+<!-- Search / Filter Form -->
+
+<form method="GET"
+      action="{{ url_for('support_requests') }}"
+      class="filter-form">
+
+    <div class="filter-row">
+
+        <!-- Search -->
+
         <input
             type="text"
             name="search"
-            class="form-control"
-            placeholder="Search by Request ID, Issue Type, Status or Created Date"
+            placeholder="Search Request ID, Issue Type, Description, Status or Date"
             value="{{ search }}"
         >
-        <button type="submit" class="btn btn-dark">Search</button>
+
+
+        <!-- Status Filter -->
+
+        <select name="status">
+
+            <option value="">All Status</option>
+
+            <option value="Open"
+                {% if status == "Open" %}selected{% endif %}>
+                Open
+            </option>
+
+            <option value="In Progress"
+                {% if status == "In Progress" %}selected{% endif %}>
+                In Progress
+            </option>
+
+            <option value="Resolved"
+                {% if status == "Resolved" %}selected{% endif %}>
+                Resolved
+            </option>
+
+            <option value="Closed"
+                {% if status == "Closed" %}selected{% endif %}>
+                Closed
+            </option>
+
+        </select>
+
+
+        <!-- Sort By -->
+
+        <select name="sort_by">
+
+            <option value="request_id"
+                {% if sort_by == "request_id" %}selected{% endif %}>
+                Request ID
+            </option>
+
+            <option value="issue_type"
+                {% if sort_by == "issue_type" %}selected{% endif %}>
+                Issue Type
+            </option>
+
+            <option value="description"
+                {% if sort_by == "description" %}selected{% endif %}>
+                Description
+            </option>
+
+            <option value="status"
+                {% if sort_by == "status" %}selected{% endif %}>
+                Status
+            </option>
+
+            <option value="created_date"
+                {% if sort_by == "created_date" %}selected{% endif %}>
+                Created Date
+            </option>
+
+        </select>
+
+
+        <!-- Sort Order -->
+
+        <select name="sort_order">
+
+            <option value="asc"
+                {% if sort_order == "asc" %}selected{% endif %}>
+                Ascending
+            </option>
+
+            <option value="desc"
+                {% if sort_order == "desc" %}selected{% endif %}>
+                Descending
+            </option>
+
+        </select>
+
     </div>
+
+
+    <!-- Buttons -->
+
+    <div class="button-row">
+
+        <button type="submit">
+            Search / Filter
+        </button>
+
+        <a
+            href="{{ url_for('support_requests') }}"
+            class="reset-button">
+            Reset
+        </a>
+
+    </div>
+
 </form>
 
-<table class="table table-bordered table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Request ID</th>
-            <th>Issue Type</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th>Created Date</th>
-        </tr>
-    </thead>
 
-    <tbody>
-        {% for request in support_requests %}
-        <tr>
-            <td>{{ request[0] }}</td>
-            <td>{{ request[1] }}</td>
-            <td>{{ request[2] }}</td>
-            <td>{{ request[3] }}</td>
-            <td>{{ request[4] }}</td>
-        </tr>
+<!-- Table -->
+
+<div class="table-container">
+
+    <table class="support-table">
+
+        <thead>
+
+            <tr>
+
+                <!-- Request ID -->
+
+                <th>
+
+                    <a href="{{ url_for('support_requests',
+                        search=search,
+                        status=status,
+                        sort_by='request_id',
+                        sort_order='desc' if sort_by == 'request_id' and sort_order == 'asc' else 'asc',
+                        page=1
+                    ) }}">
+
+                        Request ID
+
+                        {% if sort_by == "request_id" %}
+
+                            {% if sort_order == "asc" %}
+                                ↑
+                            {% else %}
+                                ↓
+                            {% endif %}
+
+                        {% else %}
+                            ↕
+                        {% endif %}
+
+                    </a>
+
+                </th>
+
+
+                <!-- Issue Type -->
+
+                <th>
+
+                    <a href="{{ url_for('support_requests',
+                        search=search,
+                        status=status,
+                        sort_by='issue_type',
+                        sort_order='desc' if sort_by == 'issue_type' and sort_order == 'asc' else 'asc',
+                        page=1
+                    ) }}">
+
+                        Issue Type
+
+                        {% if sort_by == "issue_type" %}
+
+                            {% if sort_order == "asc" %}
+                                ↑
+                            {% else %}
+                                ↓
+                            {% endif %}
+
+                        {% else %}
+                            ↕
+                        {% endif %}
+
+                    </a>
+
+                </th>
+
+
+                <!-- Description -->
+
+                <th>
+
+                    <a href="{{ url_for('support_requests',
+                        search=search,
+                        status=status,
+                        sort_by='description',
+                        sort_order='desc' if sort_by == 'description' and sort_order == 'asc' else 'asc',
+                        page=1
+                    ) }}">
+
+                        Description
+
+                        {% if sort_by == "description" %}
+
+                            {% if sort_order == "asc" %}
+                                ↑
+                            {% else %}
+                                ↓
+                            {% endif %}
+
+                        {% else %}
+                            ↕
+                        {% endif %}
+
+                    </a>
+
+                </th>
+
+
+                <!-- Status -->
+
+                <th>
+
+                    <a href="{{ url_for('support_requests',
+                        search=search,
+                        status=status,
+                        sort_by='status',
+                        sort_order='desc' if sort_by == 'status' and sort_order == 'asc' else 'asc',
+                        page=1
+                    ) }}">
+
+                        Status
+
+                        {% if sort_by == "status" %}
+
+                            {% if sort_order == "asc" %}
+                                ↑
+                            {% else %}
+                                ↓
+                            {% endif %}
+
+                        {% else %}
+                            ↕
+                        {% endif %}
+
+                    </a>
+
+                </th>
+
+
+                <!-- Created Date -->
+
+                <th>
+
+                    <a href="{{ url_for('support_requests',
+                        search=search,
+                        status=status,
+                        sort_by='created_date',
+                        sort_order='desc' if sort_by == 'created_date' and sort_order == 'asc' else 'asc',
+                        page=1
+                    ) }}">
+
+                        Created Date
+
+                        {% if sort_by == "created_date" %}
+
+                            {% if sort_order == "asc" %}
+                                ↑
+                            {% else %}
+                                ↓
+                            {% endif %}
+
+                        {% else %}
+                            ↕
+                        {% endif %}
+
+                    </a>
+
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for request in support_requests %}
+
+            <tr>
+
+                <td>{{ request[0] }}</td>
+
+                <td>{{ request[1] }}</td>
+
+                <td>{{ request[2] }}</td>
+
+                <td>{{ request[3] }}</td>
+
+                <td>{{ request[4] }}</td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+                <td colspan="5" class="no-results">
+                    No results found
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<!-- Pagination -->
+
+{% if total_pages > 1 %}
+
+<div class="pagination">
+
+
+    <!-- Previous -->
+
+    {% if page > 1 %}
+
+    <a href="{{ url_for('support_requests',
+        search=search,
+        status=status,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        page=page-1
+    ) }}">
+
+        Previous
+
+    </a>
+
+    {% else %}
+
+    <span class="disabled">
+        Previous
+    </span>
+
+    {% endif %}
+
+
+    <!-- Page Numbers -->
+
+    {% for page_num in range(1, total_pages + 1) %}
+
+        {% if page_num == page %}
+
+        <span class="active">
+            {{ page_num }}
+        </span>
+
         {% else %}
-        <tr>
-            <td colspan="5" class="text-center">
-                No results found
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+        <a href="{{ url_for('support_requests',
+            search=search,
+            status=status,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page_num
+        ) }}">
+
+            {{ page_num }}
+
+        </a>
+
+        {% endif %}
+
+    {% endfor %}
+
+
+    <!-- Next -->
+
+    {% if page < total_pages %}
+
+    <a href="{{ url_for('support_requests',
+        search=search,
+        status=status,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        page=page+1
+    ) }}">
+
+        Next
+
+    </a>
+
+    {% else %}
+
+    <span class="disabled">
+        Next
+    </span>
+
+    {% endif %}
+
+
+</div>
+
+{% endif %}
+
 
 {% endblock %}

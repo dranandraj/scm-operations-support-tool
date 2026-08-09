@@ -6,30 +6,211 @@
 
 <h2 class="mb-4">Customers</h2>
 
-<form method="GET" action="/customers" class="mb-4">
-    <div class="input-group">
-        <input
-            type="text"
-            name="search"
-            class="form-control"
-            placeholder="Search by Customer ID, Name or Country"
-            value="{{ search }}"
-        >
-        <button type="submit" class="btn btn-dark">
-            Search
-        </button>
+<form method="GET" action="/customers">
+
+    <div class="row g-2 mb-3">
+
+        <!-- Search -->
+        <div class="col-md-4">
+            <input
+                type="text"
+                name="search"
+                class="form-control"
+                placeholder="Search by Customer ID, Name, Country or Status"
+                value="{{ search }}"
+            >
+        </div>
+
+        <!-- Country Filter -->
+        <div class="col-md-2">
+            <select name="country" class="form-select">
+                <option value="">All Countries</option>
+
+                <option value="Japan" {% if country == "Japan" %}selected{% endif %}>
+                    Japan
+                </option>
+
+                <option value="USA" {% if country == "USA" %}selected{% endif %}>
+                    USA
+                </option>
+
+                <option value="India" {% if country == "India" %}selected{% endif %}>
+                    India
+                </option>
+
+                <option value="Germany" {% if country == "Germany" %}selected{% endif %}>
+                    Germany
+                </option>
+            </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-md-2">
+            <select name="status" class="form-select">
+                <option value="">All Status</option>
+
+                <option value="Active" {% if status == "Active" %}selected{% endif %}>
+                    Active
+                </option>
+
+                <option value="Inactive" {% if status == "Inactive" %}selected{% endif %}>
+                    Inactive
+                </option>
+            </select>
+        </div>
+
+        <!-- Sort By -->
+        <div class="col-md-2">
+            <select name="sort_by" class="form-select">
+
+                <option value="customer_id"
+                    {% if sort_by == "customer_id" %}selected{% endif %}>
+                    Customer ID
+                </option>
+
+                <option value="customer_name"
+                    {% if sort_by == "customer_name" %}selected{% endif %}>
+                    Customer Name
+                </option>
+
+                <option value="country"
+                    {% if sort_by == "country" %}selected{% endif %}>
+                    Country
+                </option>
+
+                <option value="status"
+                    {% if sort_by == "status" %}selected{% endif %}>
+                    Status
+                </option>
+
+            </select>
+        </div>
+
+        <!-- Sort Order -->
+        <div class="col-md-2">
+            <select name="sort_order" class="form-select">
+
+                <option value="asc"
+                    {% if sort_order == "asc" %}selected{% endif %}>
+                    Ascending
+                </option>
+
+                <option value="desc"
+                    {% if sort_order == "desc" %}selected{% endif %}>
+                    Descending
+                </option>
+
+            </select>
+        </div>
+
     </div>
+
+    <div class="mb-4">
+        <button type="submit" class="btn btn-dark">
+            Search / Filter
+        </button>
+
+        <a href="/customers" class="btn btn-secondary">
+            Reset
+        </a>
+    </div>
+
 </form>
 
 <table class="table table-bordered table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Customer ID</th>
-            <th>Customer Name</th>
-            <th>Country</th>
-            <th>Status</th>
-        </tr>
-    </thead>
+<thead class="table-dark">
+    <tr>
+
+        <!-- Customer ID -->
+        <th>
+            <a
+                class="sortable-header"
+                href="/customers?search={{ search }}&country={{ country }}&status={{ status }}&sort_by=customer_id&sort_order={% if sort_by == 'customer_id' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+            >
+                Customer ID
+
+                <span class="sort-icon">
+                    {% if sort_by == "customer_id" %}
+                        {% if sort_order == "asc" %}
+                            ↑
+                        {% else %}
+                            ↓
+                        {% endif %}
+                    {% else %}
+                        ↕
+                    {% endif %}
+                </span>
+            </a>
+        </th>
+
+        <!-- Customer Name -->
+        <th>
+            <a
+                class="sortable-header"
+                href="/customers?search={{ search }}&country={{ country }}&status={{ status }}&sort_by=customer_name&sort_order={% if sort_by == 'customer_name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+            >
+                Customer Name
+
+                <span class="sort-icon">
+                    {% if sort_by == "customer_name" %}
+                        {% if sort_order == "asc" %}
+                            ↑
+                        {% else %}
+                            ↓
+                        {% endif %}
+                    {% else %}
+                        ↕
+                    {% endif %}
+                </span>
+            </a>
+        </th>
+
+        <!-- Country -->
+        <th>
+            <a
+                class="sortable-header"
+                href="/customers?search={{ search }}&country={{ country }}&status={{ status }}&sort_by=country&sort_order={% if sort_by == 'country' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+            >
+                Country
+
+                <span class="sort-icon">
+                    {% if sort_by == "country" %}
+                        {% if sort_order == "asc" %}
+                            ↑
+                        {% else %}
+                            ↓
+                        {% endif %}
+                    {% else %}
+                        ↕
+                    {% endif %}
+                </span>
+            </a>
+        </th>
+
+        <!-- Status -->
+        <th>
+            <a
+                class="sortable-header"
+                href="/customers?search={{ search }}&country={{ country }}&status={{ status }}&sort_by=status&sort_order={% if sort_by == 'status' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+            >
+                Status
+
+                <span class="sort-icon">
+                    {% if sort_by == "status" %}
+                        {% if sort_order == "asc" %}
+                            ↑
+                        {% else %}
+                            ↓
+                        {% endif %}
+                    {% else %}
+                        ↕
+                    {% endif %}
+                </span>
+            </a>
+        </th>
+
+    </tr>
+</thead>
 
     <tbody>
     {% if customers %}
@@ -49,5 +230,108 @@
         </tr>
     {% endif %}
 </tbody>
+</table>
+
+<!-- Pagination -->
+
+{% if total_pages > 1 %}
+
+<nav class="mt-4">
+
+    <ul class="pagination justify-content-center">
+
+        <!-- Previous -->
+        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+
+            {% if page > 1 %}
+
+            <a
+                class="page-link"
+                href="{{ url_for(
+                    'customers',
+                    search=search,
+                    country=country,
+                    status=status,
+                    sort_by=sort_by,
+                    sort_order=sort_order,
+                    page=page-1
+                ) }}"
+            >
+                Previous
+            </a>
+
+            {% else %}
+
+            <span class="page-link">
+                Previous
+            </span>
+
+            {% endif %}
+
+        </li>
+
+
+        <!-- Page Numbers -->
+
+        {% for page_number in range(1, total_pages + 1) %}
+
+        <li class="page-item {% if page_number == page %}active{% endif %}">
+
+            <a
+                class="page-link"
+                href="{{ url_for(
+                    'customers',
+                    search=search,
+                    country=country,
+                    status=status,
+                    sort_by=sort_by,
+                    sort_order=sort_order,
+                    page=page_number
+                ) }}"
+            >
+                {{ page_number }}
+            </a>
+
+        </li>
+
+        {% endfor %}
+
+
+        <!-- Next -->
+
+        <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+
+            {% if page < total_pages %}
+
+            <a
+                class="page-link"
+                href="{{ url_for(
+                    'customers',
+                    search=search,
+                    country=country,
+                    status=status,
+                    sort_by=sort_by,
+                    sort_order=sort_order,
+                    page=page+1
+                ) }}"
+            >
+                Next
+            </a>
+
+            {% else %}
+
+            <span class="page-link">
+                Next
+            </span>
+
+            {% endif %}
+
+        </li>
+
+    </ul>
+
+</nav>
+
+{% endif %}
 
 {% endblock %}
