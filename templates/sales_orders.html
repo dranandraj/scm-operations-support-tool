@@ -6,6 +6,19 @@
 
 <h2 class="mb-4">Sales Orders</h2>
 
+<form method="GET" action="/sales_orders" class="mb-4">
+    <div class="input-group">
+        <input
+            type="text"
+            name="search"
+            class="form-control"
+            placeholder="Search by Sales Order ID, Customer ID, Material ID or Status"
+            value="{{ search }}"
+        >
+        <button type="submit" class="btn btn-dark">Search</button>
+    </div>
+</form>
+
 <table class="table table-bordered table-hover">
     <thead class="table-dark">
         <tr>
@@ -14,6 +27,7 @@
             <th>Material ID</th>
             <th>Quantity</th>
             <th>Status</th>
+            <th>Order Date</th>
         </tr>
     </thead>
 
@@ -25,6 +39,13 @@
             <td>{{ order[2] }}</td>
             <td>{{ order[3] }}</td>
             <td>{{ order[4] }}</td>
+            <td>{{ order[5] }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" class="text-center">
+                No results found
+            </td>
         </tr>
         {% endfor %}
     </tbody>

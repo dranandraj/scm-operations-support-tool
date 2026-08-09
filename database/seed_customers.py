@@ -19,7 +19,7 @@ cursor = connection.cursor()
 
 for i in range(1, 51):
 
-    customer_id = f"C{i:03}"
+    customer_id = f"C{i:03d}"
     customer_name = f"Customer {i}"
     country = random.choice(["Japan", "India", "USA", "Germany", "Singapore"])
     status = random.choice(["Active", "Inactive"])

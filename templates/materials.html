@@ -6,6 +6,19 @@
 
 <h2 class="mb-4">Materials</h2>
 
+<form method="GET" action="/materials" class="mb-4">
+    <div class="input-group">
+        <input
+            type="text"
+            name="search"
+            class="form-control"
+            placeholder="Search by Material ID, Name, Category, Plant or Status"
+            value="{{ search }}"
+        >
+        <button type="submit" class="btn btn-dark">Search</button>
+    </div>
+</form>
+
 <table class="table table-bordered table-hover">
     <thead class="table-dark">
         <tr>
@@ -27,6 +40,13 @@
             <td>{{ material[3] }}</td>
             <td>{{ material[4] }}</td>
             <td>{{ material[5] }}</td>
+        </tr>
+
+        {% else %}
+        <tr>
+            <td colspan="6" class="text-center">
+                No results found
+            </td>
         </tr>
         {% endfor %}
     </tbody>

@@ -19,7 +19,7 @@ cursor = connection.cursor()
 
 for i in range(1, 51):
 
-    material_id = f"M{i:03}"
+    material_id = f"M{i:03d}"
     material_name = f"Material {i}"
     category = random.choice(["Electronics", "Hardware", "Software", "Networks", "Accessories"])
     plant = random.choice(["JP01", "IN01", "US01", "GR01", "SG01"])

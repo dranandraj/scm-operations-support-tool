@@ -6,6 +6,21 @@
 
 <h2 class="mb-4">Customers</h2>
 
+<form method="GET" action="/customers" class="mb-4">
+    <div class="input-group">
+        <input
+            type="text"
+            name="search"
+            class="form-control"
+            placeholder="Search by Customer ID, Name or Country"
+            value="{{ search }}"
+        >
+        <button type="submit" class="btn btn-dark">
+            Search
+        </button>
+    </div>
+</form>
+
 <table class="table table-bordered table-hover">
     <thead class="table-dark">
         <tr>
@@ -17,6 +32,7 @@
     </thead>
 
     <tbody>
+    {% if customers %}
         {% for customer in customers %}
         <tr>
             <td>{{ customer[0] }}</td>
@@ -25,7 +41,13 @@
             <td>{{ customer[3] }}</td>
         </tr>
         {% endfor %}
-    </tbody>
-</table>
+    {% else %}
+        <tr>
+            <td colspan="4" class="text-center">
+                No results found
+            </td>
+        </tr>
+    {% endif %}
+</tbody>
 
 {% endblock %}

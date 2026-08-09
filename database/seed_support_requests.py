@@ -18,7 +18,7 @@ cursor = connection.cursor()
 # -----------------------------------
 
 for i in range(1, 51):
-    request_id = f"REQ{i:03}"
+    request_id = f"SR{i:03d}"
     issue_type = random.choice([
     "Order Error",
     "Customer Master",
