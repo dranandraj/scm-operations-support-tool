@@ -110,25 +110,35 @@
         text-align: center;
         padding: 20px !important;
     }
+
+    .page-size-row {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .page-size-row select {
+        width: 90px;
+    }
 </style>
 
 
 <h1 class="page-title">Sales Orders</h1>
 
 
-<form method="GET"
-      action="{{ url_for('sales_orders') }}"
-      class="filter-form">
+<!-- ============================= -->
+<!-- Search / Filter Form -->
+<!-- ============================= -->
+
+<form method="GET" action="{{ url_for('sales_orders') }}" class="filter-form">
 
     <div class="filter-row">
 
         <!-- Search -->
-        <input
-            type="text"
-            name="search"
-            placeholder="Search Order ID, Customer ID, Material ID or Status"
-            value="{{ search }}"
-        >
+        <input type="text" name="search" placeholder="Search Order ID, Customer ID, Material ID or Status"
+            value="{{ search }}">
 
 
         <!-- Status -->
@@ -136,23 +146,19 @@
 
             <option value="">All Status</option>
 
-            <option value="Pending"
-                {% if status == "Pending" %}selected{% endif %}>
+            <option value="Pending" {% if status=="Pending" %}selected{% endif %}>
                 Pending
             </option>
 
-            <option value="Shipped"
-                {% if status == "Shipped" %}selected{% endif %}>
+            <option value="Shipped" {% if status=="Shipped" %}selected{% endif %}>
                 Shipped
             </option>
 
-            <option value="Delivered"
-                {% if status == "Delivered" %}selected{% endif %}>
+            <option value="Delivered" {% if status=="Delivered" %}selected{% endif %}>
                 Delivered
             </option>
 
-            <option value="Cancelled"
-                {% if status == "Cancelled" %}selected{% endif %}>
+            <option value="Cancelled" {% if status=="Cancelled" %}selected{% endif %}>
                 Cancelled
             </option>
 
@@ -162,33 +168,27 @@
         <!-- Sort By -->
         <select name="sort_by">
 
-            <option value="order_id"
-                {% if sort_by == "order_id" %}selected{% endif %}>
+            <option value="order_id" {% if sort_by=="order_id" %}selected{% endif %}>
                 Sales Order ID
             </option>
 
-            <option value="customer_id"
-                {% if sort_by == "customer_id" %}selected{% endif %}>
+            <option value="customer_id" {% if sort_by=="customer_id" %}selected{% endif %}>
                 Customer ID
             </option>
 
-            <option value="material_id"
-                {% if sort_by == "material_id" %}selected{% endif %}>
+            <option value="material_id" {% if sort_by=="material_id" %}selected{% endif %}>
                 Material ID
             </option>
 
-            <option value="quantity"
-                {% if sort_by == "quantity" %}selected{% endif %}>
+            <option value="quantity" {% if sort_by=="quantity" %}selected{% endif %}>
                 Quantity
             </option>
 
-            <option value="status"
-                {% if sort_by == "status" %}selected{% endif %}>
+            <option value="status" {% if sort_by=="status" %}selected{% endif %}>
                 Status
             </option>
 
-            <option value="order_date"
-                {% if sort_by == "order_date" %}selected{% endif %}>
+            <option value="order_date" {% if sort_by=="order_date" %}selected{% endif %}>
                 Order Date
             </option>
 
@@ -198,13 +198,11 @@
         <!-- Sort Order -->
         <select name="sort_order">
 
-            <option value="asc"
-                {% if sort_order == "asc" %}selected{% endif %}>
+            <option value="asc" {% if sort_order=="asc" %}selected{% endif %}>
                 Ascending
             </option>
 
-            <option value="desc"
-                {% if sort_order == "desc" %}selected{% endif %}>
+            <option value="desc" {% if sort_order=="desc" %}selected{% endif %}>
                 Descending
             </option>
 
@@ -219,10 +217,28 @@
             Search / Filter
         </button>
 
-        <a
-            href="{{ url_for('sales_orders') }}"
-            class="reset-button">
+        <a href="{{ url_for('sales_orders') }}" class="reset-button">
             Reset
+        </a>
+
+        <a class="btn btn-success" href="{{ url_for(
+                        'export_sales_orders_csv',
+                        search=search,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order
+                    ) }}">
+            Download CSV
+        </a>
+
+        <a class="btn btn-primary" href="{{ url_for(
+                        'export_sales_orders_excel',
+                        search=search,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order
+                    ) }}">
+            Download Excel
         </a>
 
     </div>
@@ -230,154 +246,242 @@
 </form>
 
 
+<!-- ============================= -->
+<!-- Sales Orders Table -->
+<!-- ============================= -->
+
 <div class="table-container">
 
-<table class="sales-table">
+    <table class="sales-table">
 
-    <thead>
-        <tr>
+        <thead>
+            <tr>
 
-            <!-- Sales Order ID -->
-            <th>
-                <a href="{{ url_for('sales_orders',
+                <!-- Sales Order ID -->
+                <th>
+                    <a href="{{ url_for(
+                    'sales_orders',
                     search=search,
                     status=status,
                     sort_by='order_id',
-                    sort_order='desc' if sort_by == 'order_id' and sort_order == 'asc' else 'asc'
+                    sort_order='desc' if sort_by == 'order_id' and sort_order == 'asc' else 'asc',
+                    per_page=per_page,
+                    page=1
                 ) }}">
-                    Sales Order ID
-                    {% if sort_by == "order_id" %}
-                        {% if sort_order == "asc" %} ↑{% else %} ↓{% endif %}
-                    {% else %}
+                        Sales Order ID
+
+                        {% if sort_by == "order_id" %}
+                        {% if sort_order == "asc" %}
+                        ↑
+                        {% else %}
+                        ↓
+                        {% endif %}
+                        {% else %}
                         ↕
-                    {% endif %}
-                </a>
-            </th>
+                        {% endif %}
+                    </a>
+                </th>
 
 
-            <!-- Customer ID -->
-            <th>
-                <a href="{{ url_for('sales_orders',
+                <!-- Customer ID -->
+                <th>
+                    <a href="{{ url_for(
+                    'sales_orders',
                     search=search,
                     status=status,
                     sort_by='customer_id',
-                    sort_order='desc' if sort_by == 'customer_id' and sort_order == 'asc' else 'asc'
+                    sort_order='desc' if sort_by == 'customer_id' and sort_order == 'asc' else 'asc',
+                    per_page=per_page,
+                    page=1
                 ) }}">
-                    Customer ID
-                    {% if sort_by == "customer_id" %}
-                        {% if sort_order == "asc" %} ↑{% else %} ↓{% endif %}
-                    {% else %}
+                        Customer ID
+
+                        {% if sort_by == "customer_id" %}
+                        {% if sort_order == "asc" %}
+                        ↑
+                        {% else %}
+                        ↓
+                        {% endif %}
+                        {% else %}
                         ↕
-                    {% endif %}
-                </a>
-            </th>
+                        {% endif %}
+                    </a>
+                </th>
 
 
-            <!-- Material ID -->
-            <th>
-                <a href="{{ url_for('sales_orders',
+                <!-- Material ID -->
+                <th>
+                    <a href="{{ url_for(
+                    'sales_orders',
                     search=search,
                     status=status,
                     sort_by='material_id',
-                    sort_order='desc' if sort_by == 'material_id' and sort_order == 'asc' else 'asc'
+                    sort_order='desc' if sort_by == 'material_id' and sort_order == 'asc' else 'asc',
+                    per_page=per_page,
+                    page=1
                 ) }}">
-                    Material ID
-                    {% if sort_by == "material_id" %}
-                        {% if sort_order == "asc" %} ↑{% else %} ↓{% endif %}
-                    {% else %}
+                        Material ID
+
+                        {% if sort_by == "material_id" %}
+                        {% if sort_order == "asc" %}
+                        ↑
+                        {% else %}
+                        ↓
+                        {% endif %}
+                        {% else %}
                         ↕
-                    {% endif %}
-                </a>
-            </th>
+                        {% endif %}
+                    </a>
+                </th>
 
 
-            <!-- Quantity -->
-            <th>
-                <a href="{{ url_for('sales_orders',
+                <!-- Quantity -->
+                <th>
+                    <a href="{{ url_for(
+                    'sales_orders',
                     search=search,
                     status=status,
                     sort_by='quantity',
-                    sort_order='desc' if sort_by == 'quantity' and sort_order == 'asc' else 'asc'
+                    sort_order='desc' if sort_by == 'quantity' and sort_order == 'asc' else 'asc',
+                    per_page=per_page,
+                    page=1
                 ) }}">
-                    Quantity
-                    {% if sort_by == "quantity" %}
-                        {% if sort_order == "asc" %} ↑{% else %} ↓{% endif %}
-                    {% else %}
+                        Quantity
+
+                        {% if sort_by == "quantity" %}
+                        {% if sort_order == "asc" %}
+                        ↑
+                        {% else %}
+                        ↓
+                        {% endif %}
+                        {% else %}
                         ↕
-                    {% endif %}
-                </a>
-            </th>
+                        {% endif %}
+                    </a>
+                </th>
 
 
-            <!-- Status -->
-            <th>
-                <a href="{{ url_for('sales_orders',
+                <!-- Status -->
+                <th>
+                    <a href="{{ url_for(
+                    'sales_orders',
                     search=search,
                     status=status,
                     sort_by='status',
-                    sort_order='desc' if sort_by == 'status' and sort_order == 'asc' else 'asc'
+                    sort_order='desc' if sort_by == 'status' and sort_order == 'asc' else 'asc',
+                    per_page=per_page,
+                    page=1
                 ) }}">
-                    Status
-                    {% if sort_by == "status" %}
-                        {% if sort_order == "asc" %} ↑{% else %} ↓{% endif %}
-                    {% else %}
+                        Status
+
+                        {% if sort_by == "status" %}
+                        {% if sort_order == "asc" %}
+                        ↑
+                        {% else %}
+                        ↓
+                        {% endif %}
+                        {% else %}
                         ↕
-                    {% endif %}
-                </a>
-            </th>
+                        {% endif %}
+                    </a>
+                </th>
 
 
-            <!-- Order Date -->
-            <th>
-                <a href="{{ url_for('sales_orders',
+                <!-- Order Date -->
+                <th>
+                    <a href="{{ url_for(
+                    'sales_orders',
                     search=search,
                     status=status,
                     sort_by='order_date',
-                    sort_order='desc' if sort_by == 'order_date' and sort_order == 'asc' else 'asc'
+                    sort_order='desc' if sort_by == 'order_date' and sort_order == 'asc' else 'asc',
+                    per_page=per_page,
+                    page=1
                 ) }}">
-                    Order Date
-                    {% if sort_by == "order_date" %}
-                        {% if sort_order == "asc" %} ↑{% else %} ↓{% endif %}
-                    {% else %}
+                        Order Date
+
+                        {% if sort_by == "order_date" %}
+                        {% if sort_order == "asc" %}
+                        ↑
+                        {% else %}
+                        ↓
+                        {% endif %}
+                        {% else %}
                         ↕
-                    {% endif %}
-                </a>
-            </th>
+                        {% endif %}
+                    </a>
+                </th>
 
-        </tr>
-    </thead>
+            </tr>
+        </thead>
 
 
-    <tbody>
+        <tbody>
 
-        {% for order in sales_orders %}
+            {% for order in sales_orders %}
 
-        <tr>
-            <td>{{ order[0] }}</td>
-            <td>{{ order[1] }}</td>
-            <td>{{ order[2] }}</td>
-            <td>{{ order[3] }}</td>
-            <td>{{ order[4] }}</td>
-            <td>{{ order[5] }}</td>
-        </tr>
+            <tr>
+                <td>{{ order[0] }}</td>
+                <td>{{ order[1] }}</td>
+                <td>{{ order[2] }}</td>
+                <td>{{ order[3] }}</td>
+                <td>{{ order[4] }}</td>
+                <td>{{ order[5] }}</td>
+            </tr>
 
-        {% else %}
+            {% else %}
 
-        <tr>
-            <td colspan="6" class="no-results">
-                No results found
-            </td>
-        </tr>
+            <tr>
+                <td colspan="6" class="no-results">
+                    No results found
+                </td>
+            </tr>
 
-        {% endfor %}
+            {% endfor %}
 
-    </tbody>
+        </tbody>
 
-</table>
+    </table>
 
 </div>
 
+
+<!-- ============================= -->
+<!-- Rows Per Page -->
+<!-- ============================= -->
+
+<div class="page-size-row">
+
+    <label for="per_page" class="mb-0">
+        Rows per page:
+    </label>
+
+    <select id="per_page" class="form-select" onchange="changePageSize(this.value)">
+
+        <option value="10" {% if per_page==10 %}selected{% endif %}>
+            10
+        </option>
+
+        <option value="25" {% if per_page==25 %}selected{% endif %}>
+            25
+        </option>
+
+        <option value="50" {% if per_page==50 %}selected{% endif %}>
+            50
+        </option>
+
+        <option value="100" {% if per_page==100 %}selected{% endif %}>
+            100
+        </option>
+
+    </select>
+
+</div>
+
+
+<!-- ============================= -->
 <!-- Pagination -->
+<!-- ============================= -->
 
 {% if total_pages > 1 %}
 
@@ -385,23 +489,22 @@
 
     <ul class="pagination justify-content-center">
 
+
         <!-- Previous -->
 
         <li class="page-item {% if page == 1 %}disabled{% endif %}">
 
             {% if page > 1 %}
 
-            <a
-                class="page-link"
-                href="{{ url_for(
+            <a class="page-link" href="{{ url_for(
                     'sales_orders',
                     search=search,
                     status=status,
                     sort_by=sort_by,
                     sort_order=sort_order,
+                    per_page=per_page,
                     page=page-1
-                ) }}"
-            >
+                ) }}">
                 Previous
             </a>
 
@@ -422,17 +525,15 @@
 
         <li class="page-item {% if page_number == page %}active{% endif %}">
 
-            <a
-                class="page-link"
-                href="{{ url_for(
+            <a class="page-link" href="{{ url_for(
                     'sales_orders',
                     search=search,
                     status=status,
                     sort_by=sort_by,
                     sort_order=sort_order,
+                    per_page=per_page,
                     page=page_number
-                ) }}"
-            >
+                ) }}">
                 {{ page_number }}
             </a>
 
@@ -445,29 +546,25 @@
 
         <li class="page-item {% if page == total_pages %}disabled{% endif %}">
 
-            {% if page < total_pages %}
-
-            <a
-                class="page-link"
-                href="{{ url_for(
+            {% if page < total_pages %} <a class="page-link" href="{{ url_for(
                     'sales_orders',
                     search=search,
                     status=status,
                     sort_by=sort_by,
                     sort_order=sort_order,
+                    per_page=per_page,
                     page=page+1
-                ) }}"
-            >
+                ) }}">
                 Next
-            </a>
+                </a>
 
-            {% else %}
+                {% else %}
 
-            <span class="page-link">
-                Next
-            </span>
+                <span class="page-link">
+                    Next
+                </span>
 
-            {% endif %}
+                {% endif %}
 
         </li>
 
@@ -476,5 +573,26 @@
 </nav>
 
 {% endif %}
+
+
+<!-- ============================= -->
+<!-- Change Page Size -->
+<!-- ============================= -->
+
+<script>
+    function changePageSize(value) {
+
+        const url = new URL(window.location.href);
+
+        url.searchParams.set("per_page", value);
+
+        // When changing page size,
+        // always start from page 1.
+        url.searchParams.set("page", "1");
+
+        window.location.href = url.toString();
+    }
+</script>
+
 
 {% endblock %}

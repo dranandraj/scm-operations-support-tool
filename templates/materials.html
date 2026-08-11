@@ -6,169 +6,197 @@
 
 <h1 class="mb-4">Materials</h1>
 
+
 <!-- Search + Filters + Sort -->
+
 <form method="GET" action="{{ url_for('materials') }}">
 
     <div class="row g-2 mb-3">
 
         <!-- Search -->
         <div class="col-md-3">
-            <input
-                type="text"
-                name="search"
-                class="form-control"
-                placeholder="Search Material"
-                value="{{ search }}"
-            >
+            <input type="text" name="search" class="form-control" placeholder="Search Material" value="{{ search }}">
         </div>
+
 
         <!-- Category Filter -->
         <div class="col-md-2">
-            <select name="category" class="form-select">
-                <option value="">All Categories</option>
 
-                <option value="Electronics"
-                    {% if category == "Electronics" %}selected{% endif %}>
+            <select name="category" class="form-select">
+
+                <option value="">
+                    All Categories
+                </option>
+
+                <option value="Electronics" {% if category=="Electronics" %}selected{% endif %}>
                     Electronics
                 </option>
 
-                <option value="Hardware"
-                    {% if category == "Hardware" %}selected{% endif %}>
+                <option value="Hardware" {% if category=="Hardware" %}selected{% endif %}>
                     Hardware
                 </option>
 
-                <option value="Software"
-                    {% if category == "Software" %}selected{% endif %}>
+                <option value="Software" {% if category=="Software" %}selected{% endif %}>
                     Software
                 </option>
 
-                <option value="Networks"
-                    {% if category == "Networks" %}selected{% endif %}>
+                <option value="Networks" {% if category=="Networks" %}selected{% endif %}>
                     Networks
                 </option>
 
-                <option value="Accessories"
-                    {% if category == "Accessories" %}selected{% endif %}>
+                <option value="Accessories" {% if category=="Accessories" %}selected{% endif %}>
                     Accessories
                 </option>
+
             </select>
+
         </div>
+
 
         <!-- Plant Filter -->
         <div class="col-md-2">
-            <select name="plant" class="form-select">
-                <option value="">All Plants</option>
 
-                <option value="JP01"
-                    {% if plant == "JP01" %}selected{% endif %}>
+            <select name="plant" class="form-select">
+
+                <option value="">
+                    All Plants
+                </option>
+
+                <option value="JP01" {% if plant=="JP01" %}selected{% endif %}>
                     JP01
                 </option>
 
-                <option value="IN01"
-                    {% if plant == "IN01" %}selected{% endif %}>
+                <option value="IN01" {% if plant=="IN01" %}selected{% endif %}>
                     IN01
                 </option>
 
-                <option value="US01"
-                    {% if plant == "US01" %}selected{% endif %}>
+                <option value="US01" {% if plant=="US01" %}selected{% endif %}>
                     US01
                 </option>
 
-                <option value="GR01"
-                    {% if plant == "GR01" %}selected{% endif %}>
+                <option value="GR01" {% if plant=="GR01" %}selected{% endif %}>
                     GR01
                 </option>
 
-                <option value="SG01"
-                    {% if plant == "SG01" %}selected{% endif %}>
+                <option value="SG01" {% if plant=="SG01" %}selected{% endif %}>
                     SG01
                 </option>
+
             </select>
+
         </div>
+
 
         <!-- Status Filter -->
         <div class="col-md-2">
-            <select name="status" class="form-select">
-                <option value="">All Status</option>
 
-                <option value="Available"
-                    {% if status == "Available" %}selected{% endif %}>
+            <select name="status" class="form-select">
+
+                <option value="">
+                    All Status
+                </option>
+
+                <option value="Available" {% if status=="Available" %}selected{% endif %}>
                     Available
                 </option>
 
-                <option value="Out of Stock"
-                    {% if status == "Out of Stock" %}selected{% endif %}>
+                <option value="Out of Stock" {% if status=="Out of Stock" %}selected{% endif %}>
                     Out of Stock
                 </option>
+
             </select>
+
         </div>
+
 
         <!-- Sort By -->
         <div class="col-md-2">
+
             <select name="sort_by" class="form-select">
 
-                <option value="material_id"
-                    {% if sort_by == "material_id" %}selected{% endif %}>
+                <option value="material_id" {% if sort_by=="material_id" %}selected{% endif %}>
                     Material ID
                 </option>
 
-                <option value="material_name"
-                    {% if sort_by == "material_name" %}selected{% endif %}>
+                <option value="material_name" {% if sort_by=="material_name" %}selected{% endif %}>
                     Material Name
                 </option>
 
-                <option value="category"
-                    {% if sort_by == "category" %}selected{% endif %}>
+                <option value="category" {% if sort_by=="category" %}selected{% endif %}>
                     Category
                 </option>
 
-                <option value="plant"
-                    {% if sort_by == "plant" %}selected{% endif %}>
+                <option value="plant" {% if sort_by=="plant" %}selected{% endif %}>
                     Plant
                 </option>
 
-                <option value="price"
-                    {% if sort_by == "price" %}selected{% endif %}>
+                <option value="price" {% if sort_by=="price" %}selected{% endif %}>
                     Price
                 </option>
 
-                <option value="status"
-                    {% if sort_by == "status" %}selected{% endif %}>
+                <option value="status" {% if sort_by=="status" %}selected{% endif %}>
                     Status
                 </option>
 
             </select>
+
         </div>
+
 
         <!-- Sort Order -->
         <div class="col-md-1">
+
             <select name="sort_order" class="form-select">
 
-                <option value="asc"
-                    {% if sort_order == "asc" %}selected{% endif %}>
+                <option value="asc" {% if sort_order=="asc" %}selected{% endif %}>
                     ASC
                 </option>
 
-                <option value="desc"
-                    {% if sort_order == "desc" %}selected{% endif %}>
+                <option value="desc" {% if sort_order=="desc" %}selected{% endif %}>
                     DESC
                 </option>
 
             </select>
+
         </div>
 
     </div>
 
+
     <!-- Buttons -->
+
     <div class="mb-4">
 
         <button type="submit" class="btn btn-dark">
             Search / Filter
         </button>
 
-        <a href="{{ url_for('materials') }}"
-           class="btn btn-secondary">
+        <a href="{{ url_for('materials') }}" class="btn btn-secondary">
             Reset
+        </a>
+
+        <a class="btn btn-success" href="{{ url_for(
+                'export_materials_csv',
+                search=search,
+                category=category,
+                plant=plant,
+                status=status,
+                sort_by=sort_by,
+                sort_order=sort_order
+            ) }}">
+            Download CSV
+        </a>
+
+        <a class="btn btn-primary" href="{{ url_for(
+                'export_materials_excel',
+                search=search,
+                category=category,
+                plant=plant,
+                status=status,
+                sort_by=sort_by,
+                sort_order=sort_order
+            ) }}">
+            Download Excel
         </a>
 
     </div>
@@ -185,188 +213,236 @@
         <tr>
 
             <!-- Material ID -->
+
             <th>
-                <a
-                    class="sortable-header"
-                    href="{{ url_for('materials',
+
+                <a class="sortable-header" href="{{ url_for(
+                        'materials',
                         search=search,
                         category=category,
                         plant=plant,
                         status=status,
                         sort_by='material_id',
-                        sort_order='desc' if sort_by == 'material_id' and sort_order == 'asc' else 'asc'
-                    ) }}"
-                >
+                        sort_order='desc' if sort_by == 'material_id' and sort_order == 'asc' else 'asc',
+                        per_page=per_page,
+                        page=1
+                    ) }}">
+
                     Material ID
 
                     <span class="sort-icon">
+
                         {% if sort_by == "material_id" %}
-                            {% if sort_order == "asc" %}
-                                ↑
-                            {% else %}
-                                ↓
-                            {% endif %}
+
+                        {% if sort_order == "asc" %}
+                        ↑
                         {% else %}
-                            ↕
+                        ↓
                         {% endif %}
+
+                        {% else %}
+                        ↕
+                        {% endif %}
+
                     </span>
 
                 </a>
+
             </th>
 
 
             <!-- Material Name -->
+
             <th>
-                <a
-                    class="sortable-header"
-                    href="{{ url_for('materials',
+
+                <a class="sortable-header" href="{{ url_for(
+                        'materials',
                         search=search,
                         category=category,
                         plant=plant,
                         status=status,
                         sort_by='material_name',
-                        sort_order='desc' if sort_by == 'material_name' and sort_order == 'asc' else 'asc'
-                    ) }}"
-                >
+                        sort_order='desc' if sort_by == 'material_name' and sort_order == 'asc' else 'asc',
+                        per_page=per_page,
+                        page=1
+                    ) }}">
+
                     Material Name
 
                     <span class="sort-icon">
+
                         {% if sort_by == "material_name" %}
-                            {% if sort_order == "asc" %}
-                                ↑
-                            {% else %}
-                                ↓
-                            {% endif %}
+
+                        {% if sort_order == "asc" %}
+                        ↑
                         {% else %}
-                            ↕
+                        ↓
                         {% endif %}
+
+                        {% else %}
+                        ↕
+                        {% endif %}
+
                     </span>
 
                 </a>
+
             </th>
 
 
             <!-- Category -->
+
             <th>
-                <a
-                    class="sortable-header"
-                    href="{{ url_for('materials',
+
+                <a class="sortable-header" href="{{ url_for(
+                        'materials',
                         search=search,
                         category=category,
                         plant=plant,
                         status=status,
                         sort_by='category',
-                        sort_order='desc' if sort_by == 'category' and sort_order == 'asc' else 'asc'
-                    ) }}"
-                >
+                        sort_order='desc' if sort_by == 'category' and sort_order == 'asc' else 'asc',
+                        per_page=per_page,
+                        page=1
+                    ) }}">
+
                     Category
 
                     <span class="sort-icon">
+
                         {% if sort_by == "category" %}
-                            {% if sort_order == "asc" %}
-                                ↑
-                            {% else %}
-                                ↓
-                            {% endif %}
+
+                        {% if sort_order == "asc" %}
+                        ↑
                         {% else %}
-                            ↕
+                        ↓
                         {% endif %}
+
+                        {% else %}
+                        ↕
+                        {% endif %}
+
                     </span>
 
                 </a>
+
             </th>
 
 
             <!-- Plant -->
+
             <th>
-                <a
-                    class="sortable-header"
-                    href="{{ url_for('materials',
+
+                <a class="sortable-header" href="{{ url_for(
+                        'materials',
                         search=search,
                         category=category,
                         plant=plant,
                         status=status,
                         sort_by='plant',
-                        sort_order='desc' if sort_by == 'plant' and sort_order == 'asc' else 'asc'
-                    ) }}"
-                >
+                        sort_order='desc' if sort_by == 'plant' and sort_order == 'asc' else 'asc',
+                        per_page=per_page,
+                        page=1
+                    ) }}">
+
                     Plant
 
                     <span class="sort-icon">
+
                         {% if sort_by == "plant" %}
-                            {% if sort_order == "asc" %}
-                                ↑
-                            {% else %}
-                                ↓
-                            {% endif %}
+
+                        {% if sort_order == "asc" %}
+                        ↑
                         {% else %}
-                            ↕
+                        ↓
                         {% endif %}
+
+                        {% else %}
+                        ↕
+                        {% endif %}
+
                     </span>
 
                 </a>
+
             </th>
 
 
             <!-- Price -->
+
             <th>
-                <a
-                    class="sortable-header"
-                    href="{{ url_for('materials',
+
+                <a class="sortable-header" href="{{ url_for(
+                        'materials',
                         search=search,
                         category=category,
                         plant=plant,
                         status=status,
                         sort_by='price',
-                        sort_order='desc' if sort_by == 'price' and sort_order == 'asc' else 'asc'
-                    ) }}"
-                >
+                        sort_order='desc' if sort_by == 'price' and sort_order == 'asc' else 'asc',
+                        per_page=per_page,
+                        page=1
+                    ) }}">
+
                     Price
 
                     <span class="sort-icon">
+
                         {% if sort_by == "price" %}
-                            {% if sort_order == "asc" %}
-                                ↑
-                            {% else %}
-                                ↓
-                            {% endif %}
+
+                        {% if sort_order == "asc" %}
+                        ↑
                         {% else %}
-                            ↕
+                        ↓
                         {% endif %}
+
+                        {% else %}
+                        ↕
+                        {% endif %}
+
                     </span>
 
                 </a>
+
             </th>
 
 
             <!-- Status -->
+
             <th>
-                <a
-                    class="sortable-header"
-                    href="{{ url_for('materials',
+
+                <a class="sortable-header" href="{{ url_for(
+                        'materials',
                         search=search,
                         category=category,
                         plant=plant,
                         status=status,
                         sort_by='status',
-                        sort_order='desc' if sort_by == 'status' and sort_order == 'asc' else 'asc'
-                    ) }}"
-                >
+                        sort_order='desc' if sort_by == 'status' and sort_order == 'asc' else 'asc',
+                        per_page=per_page,
+                        page=1
+                    ) }}">
+
                     Status
 
                     <span class="sort-icon">
+
                         {% if sort_by == "status" %}
-                            {% if sort_order == "asc" %}
-                                ↑
-                            {% else %}
-                                ↓
-                            {% endif %}
+
+                        {% if sort_order == "asc" %}
+                        ↑
                         {% else %}
-                            ↕
+                        ↓
                         {% endif %}
+
+                        {% else %}
+                        ↕
+                        {% endif %}
+
                     </span>
 
                 </a>
+
             </th>
 
         </tr>
@@ -405,110 +481,41 @@
 
 </table>
 
-<!-- Pagination -->
 
-{% if total_pages > 1 %}
+<!-- Rows Per Page -->
 
-<nav class="mt-4">
+<div class="d-flex justify-content-end align-items-center gap-2 mt-3 mb-3">
 
-    <ul class="pagination justify-content-center">
+    <label for="per_page" class="mb-0">
+        Rows per page:
+    </label>
 
-        <!-- Previous -->
+    <select id="per_page" class="form-select" style="width: 90px;" onchange="changePageSize(this.value)">
 
-        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+        <option value="10" {% if per_page==10 %}selected{% endif %}>
+            10
+        </option>
 
-            {% if page > 1 %}
+        <option value="25" {% if per_page==25 %}selected{% endif %}>
+            25
+        </option>
 
-            <a
-                class="page-link"
-                href="{{ url_for(
-                    'materials',
-                    search=search,
-                    category=category,
-                    plant=plant,
-                    status=status,
-                    sort_by=sort_by,
-                    sort_order=sort_order,
-                    page=page-1
-                ) }}"
-            >
-                Previous
-            </a>
+        <option value="50" {% if per_page==50 %}selected{% endif %}>
+            50
+        </option>
 
-            {% else %}
+        <option value="100" {% if per_page==100 %}selected{% endif %}>
+            100
+        </option>
 
-            <span class="page-link">
-                Previous
-            </span>
+    </select>
 
-            {% endif %}
-
-        </li>
+</div>
 
 
-        <!-- Page Numbers -->
+<!-- Common Pagination -->
 
-        {% for page_number in range(1, total_pages + 1) %}
+{% include "pagination.html" %}
 
-        <li class="page-item {% if page_number == page %}active{% endif %}">
-
-            <a
-                class="page-link"
-                href="{{ url_for(
-                    'materials',
-                    search=search,
-                    category=category,
-                    plant=plant,
-                    status=status,
-                    sort_by=sort_by,
-                    sort_order=sort_order,
-                    page=page_number
-                ) }}"
-            >
-                {{ page_number }}
-            </a>
-
-        </li>
-
-        {% endfor %}
-
-
-        <!-- Next -->
-
-        <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-
-            {% if page < total_pages %}
-
-            <a
-                class="page-link"
-                href="{{ url_for(
-                    'materials',
-                    search=search,
-                    category=category,
-                    plant=plant,
-                    status=status,
-                    sort_by=sort_by,
-                    sort_order=sort_order,
-                    page=page+1
-                ) }}"
-            >
-                Next
-            </a>
-
-            {% else %}
-
-            <span class="page-link">
-                Next
-            </span>
-
-            {% endif %}
-
-        </li>
-
-    </ul>
-
-</nav>
-
-{% endif %}
 
 {% endblock %}

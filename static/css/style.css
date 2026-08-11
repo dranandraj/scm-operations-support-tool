@@ -1,0 +1,27 @@
+/* =========================
+   Common Table Styles
+   ========================= */
+
+.sortable-header {
+    color: white;
+    text-decoration: none;
+}
+
+.sortable-header:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.sort-icon {
+    margin-left: 4px;
+}
+
+
+/* =========================
+   Pagination
+   ========================= */
+
+.pagination {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
