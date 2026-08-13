@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Add Customer{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1 class="mb-4">Add Customer</h1>
+
+    {% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+
+        <!-- Customer ID -->
+        <div class="mb-3">
+
+            <label for="customer_id" class="form-label">
+                Customer ID
+            </label>
+
+            <input type="text" id="customer_id" name="customer_id" class="form-control" placeholder="Example: C051"
+                value="{{ customer_id | default('') }}" required>
+
+        </div>
+
+
+        <!-- Customer Name -->
+        <div class="mb-3">
+
+            <label for="customer_name" class="form-label">
+                Customer Name
+            </label>
+
+            <input type="text" id="customer_name" name="customer_name" class="form-control"
+                placeholder="Enter customer name" value="{{ customer_name | default('') }}" required>
+
+        </div>
+
+
+        <!-- Country -->
+        <div class="mb-3">
+
+            <label for="country" class="form-label">
+                Country
+            </label>
+
+            <select id="country" name="country" class="form-select" required>
+
+                <option value="">Select Country</option>
+
+                <option value="Japan" {% if country | default('')=="Japan" %} selected {% endif %}>
+                    Japan
+                </option>
+
+                <option value="India" {% if country | default('')=="India" %} selected {% endif %}>
+                    India
+                </option>
+
+                <option value="USA" {% if country | default('')=="USA" %} selected {% endif %}>
+                    USA
+                </option>
+
+                <option value="Germany" {% if country | default('')=="Germany" %} selected {% endif %}>
+                    Germany
+                </option>
+
+                <option value="Singapore" {% if country | default('')=="Singapore" %} selected {% endif %}>
+                    Singapore
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Status -->
+        <div class="mb-4">
+
+            <label for="status" class="form-label">
+                Status
+            </label>
+
+            <select id="status" name="status" class="form-select" required>
+
+                <option value="">Select Status</option>
+
+                <option value="Active" {% if status | default('')=="Active" %} selected {% endif %}>
+                    Active
+                </option>
+
+                <option value="Inactive" {% if status | default('')=="Inactive" %} selected {% endif %}>
+                    Inactive
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Buttons -->
+        <button type="submit" class="btn btn-dark">
+            Create Customer
+        </button>
+
+        <a href="{{ url_for(
+                    'customers',
+                    search=search,
+                    country=country_filter,
+                    status=status_filter,
+                    sort_by=sort_by,
+                    sort_order=sort_order,
+                    per_page=per_page,
+                    page=page
+                ) }}" class="btn btn-secondary">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

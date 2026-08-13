@@ -42,7 +42,6 @@ def customers():
     search = request.args.get("search", "").strip()
     country = request.args.get("country", "").strip()
     status = request.args.get("status", "").strip()
-
     sort_by = request.args.get("sort_by", "customer_id")
     sort_order = request.args.get("sort_order", "asc")
 
@@ -202,6 +201,318 @@ def customers():
         total_pages=total_pages,
         current_endpoint="customers"
     )
+
+@app.route("/customers/create", methods=["GET", "POST"])
+def create_customer():
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    country_filter = request.args.get("country", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "customer_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    per_page = request.args.get("per_page", "10").strip()
+    page = request.args.get("page", "1").strip()
+
+    # -----------------------------------
+    # POST - Create customer
+    # -----------------------------------
+
+    if request.method == "POST":
+
+        customer_id = request.form.get("customer_id", "").strip()
+        customer_name = request.form.get("customer_name", "").strip()
+        country = request.form.get("country", "").strip()
+        status = request.form.get("status", "").strip()
+
+        # -----------------------------------
+        # Basic validation
+        # -----------------------------------
+
+        if not customer_id or not customer_name or not country or not status:
+
+            return render_template(
+                "customer_form.html",
+                error="All fields are required.",
+                customer_id=customer_id,
+                customer_name=customer_name,
+                country=country,
+                status=status,
+                search=search,
+                country_filter=country_filter,
+                status_filter=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                per_page=per_page,
+                page=page
+            )
+
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        # -----------------------------------
+        # Check duplicate Customer ID
+        # -----------------------------------
+
+        cursor.execute(
+            """
+            SELECT customer_id
+            FROM customers
+            WHERE customer_id = %s
+            """,
+            (customer_id,)
+        )
+
+        existing_customer = cursor.fetchone()
+
+        if existing_customer:
+
+            cursor.close()
+            connection.close()
+
+            return render_template(
+                "customer_form.html",
+                error="Customer ID already exists.",
+                customer_id=customer_id,
+                customer_name=customer_name,
+                country=country,
+                status=status,
+                search=search,
+                country_filter=country_filter,
+                status_filter=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                per_page=per_page,
+                page=page
+            )
+
+        # -----------------------------------
+        # Insert customer
+        # -----------------------------------
+
+        cursor.execute(
+            """
+            INSERT INTO customers
+                (customer_id, customer_name, country, status)
+            VALUES
+                (%s, %s, %s, %s)
+            """,
+            (
+                customer_id,
+                customer_name,
+                country,
+                status
+            )
+        )
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        # -----------------------------------
+        # Return to same filtered/sorted page
+        # -----------------------------------
+
+        return redirect(url_for(
+            "customers",
+            search=search,
+            country=country_filter,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            per_page=per_page,
+            page=page
+        ))
+
+    # -----------------------------------
+    # GET - Show create form
+    # -----------------------------------
+
+    return render_template(
+        "customer_form.html",
+        search=search,
+        country_filter=country_filter,
+        status_filter=status_filter,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        per_page=per_page,
+        page=page
+    )
+
+@app.route("/customers/<customer_id>/edit", methods=["GET", "POST"])
+def edit_customer(customer_id):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    country = request.args.get("country", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "customer_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    per_page = request.args.get("per_page", "10").strip()
+    page = request.args.get("page", "1").strip()
+
+    # -----------------------------------
+    # GET existing customer
+    # -----------------------------------
+
+    if request.method == "GET":
+
+        cursor.execute("""
+            SELECT customer_id,
+                   customer_name,
+                   country,
+                   status
+            FROM customers
+            WHERE customer_id = %s
+        """, (customer_id,))
+
+        customer = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        if not customer:
+            return "Customer not found", 404
+
+        return render_template(
+            "edit_customer.html",
+            customer=customer,
+            search=search,
+            country_filter=country,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            per_page=per_page,
+            page=page
+        )
+
+    # -----------------------------------
+    # POST - Update customer
+    # -----------------------------------
+
+    customer_name = request.form.get("customer_name", "").strip()
+    new_country = request.form.get("country", "").strip()
+    new_status = request.form.get("status", "").strip()
+
+    # Validation
+    if not customer_name or not new_country or not new_status:
+
+        cursor.execute("""
+            SELECT customer_id,
+                   customer_name,
+                   country,
+                   status
+            FROM customers
+            WHERE customer_id = %s
+        """, (customer_id,))
+
+        customer = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "edit_customer.html",
+            customer=customer,
+            error="All fields are required.",
+            search=search,
+            country_filter=country,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            per_page=per_page,
+            page=page
+        )
+
+    # -----------------------------------
+    # Update database
+    # -----------------------------------
+
+    cursor.execute("""
+        UPDATE customers
+        SET customer_name = %s,
+            country = %s,
+            status = %s
+        WHERE customer_id = %s
+    """, (
+        customer_name,
+        new_country,
+        new_status,
+        customer_id
+    ))
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    # -----------------------------------
+    # Return to same filtered/sorted page
+    # -----------------------------------
+
+    return redirect(url_for(
+        "customers",
+        search=search,
+        country=country,
+        status=status_filter,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        per_page=per_page,
+        page=page
+    ))
+
+@app.route("/customers/<customer_id>/delete", methods=["POST"])
+def delete_customer(customer_id):
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    country = request.args.get("country", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "customer_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    per_page = request.args.get("per_page", "10").strip()
+    page = request.args.get("page", "1").strip()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        DELETE FROM customers
+        WHERE customer_id = %s
+    """, (customer_id,))
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    # -----------------------------------
+    # Return to same filtered/sorted page
+    # -----------------------------------
+
+    return redirect(url_for(
+        "customers",
+        search=search,
+        country=country,
+        status=status_filter,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        per_page=per_page,
+        page=page
+    ))
 
 @app.route("/customers/export/csv")
 def export_customers_csv():
@@ -610,6 +921,409 @@ def materials():
         total_pages=total_pages
     )
 
+@app.route("/materials/create", methods=["GET", "POST"])
+def create_material():
+
+    # Preserve current Materials page state
+    search = request.args.get("search", "").strip()
+    category_filter = request.args.get("category", "").strip()
+    plant_filter = request.args.get("plant", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "material_id")
+    sort_order = request.args.get("sort_order", "asc")
+    page = request.args.get("page", "1")
+    per_page = request.args.get("per_page", "10")
+
+    if request.method == "POST":
+
+        material_id = request.form.get("material_id", "").strip()
+        material_name = request.form.get("material_name", "").strip()
+        category = request.form.get("category", "").strip()
+        plant = request.form.get("plant", "").strip()
+        price = request.form.get("price", "").strip()
+        status = request.form.get("status", "").strip()
+
+        # Preserve page state from hidden fields
+        search = request.form.get("search", search)
+        category_filter = request.form.get("category_filter", category_filter)
+        plant_filter = request.form.get("plant_filter", plant_filter)
+        status_filter = request.form.get("status_filter", status_filter)
+        sort_by = request.form.get("sort_by", sort_by)
+        sort_order = request.form.get("sort_order", sort_order)
+        page = request.form.get("page", page)
+        per_page = request.form.get("per_page", per_page)
+
+        # Basic validation
+        if not material_id or not material_name or not category or not plant or not price or not status:
+            return render_template(
+                "material_form.html",
+                error="All fields are required.",
+                material_id=material_id,
+                material_name=material_name,
+                category=category,
+                plant=plant,
+                price=price,
+                status=status,
+                search=search,
+                category_filter=category_filter,
+                plant_filter=plant_filter,
+                status_filter=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                page=page,
+                per_page=per_page
+            )
+
+        # Price validation
+        try:
+            price = float(price)
+        except ValueError:
+            return render_template(
+                "material_form.html",
+                error="Price must be a valid number.",
+                material_id=material_id,
+                material_name=material_name,
+                category=category,
+                plant=plant,
+                price=price,
+                status=status,
+                search=search,
+                category_filter=category_filter,
+                plant_filter=plant_filter,
+                status_filter=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                page=page,
+                per_page=per_page
+            )
+
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        # Check duplicate Material ID
+        cursor.execute(
+            "SELECT material_id FROM materials WHERE material_id = %s",
+            (material_id,)
+        )
+
+        existing_material = cursor.fetchone()
+
+        if existing_material:
+            cursor.close()
+            connection.close()
+
+            return render_template(
+                "material_form.html",
+                error="Material ID already exists.",
+                material_id=material_id,
+                material_name=material_name,
+                category=category,
+                plant=plant,
+                price=price,
+                status=status,
+                search=search,
+                category_filter=category_filter,
+                plant_filter=plant_filter,
+                status_filter=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                page=page,
+                per_page=per_page
+            )
+
+        # Insert material
+        cursor.execute(
+            """
+            INSERT INTO materials
+                (material_id, material_name, category, plant, price, status)
+            VALUES
+                (%s, %s, %s, %s, %s, %s)
+            """,
+            (
+                material_id,
+                material_name,
+                category,
+                plant,
+                price,
+                status
+            )
+        )
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        # Return to Materials with previous filter/sort state
+        return redirect(url_for(
+            "materials",
+            search=search,
+            category=category_filter,
+            plant=plant_filter,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page
+        ))
+
+    return render_template(
+        "material_form.html",
+        search=search,
+        category_filter=category_filter,
+        plant_filter=plant_filter,
+        status_filter=status_filter,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        page=page,
+        per_page=per_page
+    )
+
+@app.route("/materials/<material_id>/edit", methods=["GET", "POST"])
+def edit_material(material_id):
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    category_filter = request.args.get("category", "").strip()
+    plant_filter = request.args.get("plant", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "material_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    page = request.args.get("page", "1").strip()
+    per_page = request.args.get("per_page", "10").strip()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # -----------------------------------
+    # GET existing material
+    # -----------------------------------
+
+    if request.method == "GET":
+
+        cursor.execute("""
+            SELECT material_id,
+                   material_name,
+                   category,
+                   plant,
+                   price,
+                   status
+            FROM materials
+            WHERE material_id = %s
+        """, (material_id,))
+
+        material = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        if not material:
+            return "Material not found", 404
+
+        return render_template(
+            "edit_material.html",
+            material=material,
+            search=search,
+            category_filter=category_filter,
+            plant_filter=plant_filter,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page
+        )
+
+    # -----------------------------------
+    # POST - Get updated values
+    # -----------------------------------
+
+    material_name = request.form.get("material_name", "").strip()
+    category = request.form.get("category", "").strip()
+    plant = request.form.get("plant", "").strip()
+    price = request.form.get("price", "").strip()
+    status = request.form.get("status", "").strip()
+
+    # Get preserved state from hidden fields
+    search = request.form.get("search", search)
+    category_filter = request.form.get("category_filter", category_filter)
+    plant_filter = request.form.get("plant_filter", plant_filter)
+    status_filter = request.form.get("status_filter", status_filter)
+    sort_by = request.form.get("sort_by", sort_by)
+    sort_order = request.form.get("sort_order", sort_order)
+    page = request.form.get("page", page)
+    per_page = request.form.get("per_page", per_page)
+
+    # -----------------------------------
+    # Validation
+    # -----------------------------------
+
+    if not material_name or not category or not plant or not price or not status:
+
+        cursor.execute("""
+            SELECT material_id,
+                   material_name,
+                   category,
+                   plant,
+                   price,
+                   status
+            FROM materials
+            WHERE material_id = %s
+        """, (material_id,))
+
+        material = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "edit_material.html",
+            material=material,
+            error="All fields are required.",
+            search=search,
+            category_filter=category_filter,
+            plant_filter=plant_filter,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page
+        )
+
+    # -----------------------------------
+    # Price validation
+    # -----------------------------------
+
+    try:
+        price = float(price)
+
+    except ValueError:
+
+        cursor.execute("""
+            SELECT material_id,
+                   material_name,
+                   category,
+                   plant,
+                   price,
+                   status
+            FROM materials
+            WHERE material_id = %s
+        """, (material_id,))
+
+        material = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "edit_material.html",
+            material=material,
+            error="Price must be a valid number.",
+            search=search,
+            category_filter=category_filter,
+            plant_filter=plant_filter,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page
+        )
+
+    # -----------------------------------
+    # Update database
+    # -----------------------------------
+
+    cursor.execute("""
+        UPDATE materials
+        SET material_name = %s,
+            category = %s,
+            plant = %s,
+            price = %s,
+            status = %s
+        WHERE material_id = %s
+    """, (
+        material_name,
+        category,
+        plant,
+        price,
+        status,
+        material_id
+    ))
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    # -----------------------------------
+    # Return to same filtered/sorted page
+    # -----------------------------------
+
+    return redirect(url_for(
+        "materials",
+        search=search,
+        category=category_filter,
+        plant=plant_filter,
+        status=status_filter,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        page=page,
+        per_page=per_page
+    ))
+
+@app.route("/materials/<material_id>/delete", methods=["POST"])
+def delete_material(material_id):
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    category = request.args.get("category", "").strip()
+    plant = request.args.get("plant", "").strip()
+    status_filter = request.args.get("status", "").strip()
+
+    sort_by = request.args.get("sort_by", "material_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+
+    per_page = request.args.get("per_page", "10").strip()
+    page = request.args.get("page", "1").strip()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # Delete material
+    cursor.execute(
+        """
+        DELETE FROM materials
+        WHERE material_id = %s
+        """,
+        (material_id,)
+    )
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    # -----------------------------------
+    # Return to same filtered/sorted page
+    # -----------------------------------
+
+    return redirect(url_for(
+        "materials",
+        search=search,
+        category=category,
+        plant=plant,
+        status=status_filter,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        per_page=per_page,
+        page=page
+    ))
+
 @app.route("/materials/export/csv")
 def export_materials_csv():
 
@@ -723,14 +1437,14 @@ def export_materials_excel():
 
     sort_by = request.args.get("sort_by", "material_id")
     sort_order = request.args.get("sort_order", "asc")
-
+    
     # -----------------------------------
     # Allowed columns for sorting
     # -----------------------------------
 
     sort_options = {
         "material_id": "material_id",
-        "material_name": "material_name",
+        "material_name": "CAST(SUBSTRING(material_name FROM POSITION(' ' IN material_name) + 1) AS INTEGER)",
         "category": "category",
         "plant": "plant",
         "price": "price",

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h1 class="mb-4">Add Material</h1>
+
+    {% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+
+        <input type="hidden" name="search" value="{{ search or '' }}">
+        <input type="hidden" name="category_filter" value="{{ category_filter or '' }}">
+        <input type="hidden" name="plant_filter" value="{{ plant_filter or '' }}">
+        <input type="hidden" name="status_filter" value="{{ status_filter or '' }}">
+        <input type="hidden" name="sort_by" value="{{ sort_by or 'material_id' }}">
+        <input type="hidden" name="sort_order" value="{{ sort_order or 'asc' }}">
+        <input type="hidden" name="page" value="{{ page or '1' }}">
+        <input type="hidden" name="per_page" value="{{ per_page or '10' }}">
+
+        <!-- Material ID -->
+        <div class="mb-3">
+            <label class="form-label">Material ID</label>
+
+            <input type="text" name="material_id" class="form-control" value="{{ material_id or '' }}" required>
+        </div>
+
+        <!-- Material Name -->
+        <div class="mb-3">
+            <label class="form-label">Material Name</label>
+
+            <input type="text" name="material_name" class="form-control" value="{{ material_name or '' }}" required>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-3">
+            <label class="form-label">Category</label>
+
+            <select name="category" class="form-select" required>
+
+                <option value="">Select Category</option>
+
+                <option value="Electronics" {% if category=="Electronics" %}selected{% endif %}>
+                    Electronics
+                </option>
+
+                <option value="Hardware" {% if category=="Hardware" %}selected{% endif %}>
+                    Hardware
+                </option>
+
+                <option value="Software" {% if category=="Software" %}selected{% endif %}>
+                    Software
+                </option>
+
+                <option value="Networks" {% if category=="Networks" %}selected{% endif %}>
+                    Networks
+                </option>
+
+                <option value="Accessories" {% if category=="Accessories" %}selected{% endif %}>
+                    Accessories
+                </option>
+
+            </select>
+        </div>
+
+        <!-- Plant -->
+        <div class="mb-3">
+            <label class="form-label">Plant</label>
+
+            <select name="plant" class="form-select" required>
+
+                <option value="">Select Plant</option>
+
+                <option value="JP01" {% if plant=="JP01" %}selected{% endif %}>
+                    JP01
+                </option>
+
+                <option value="IN01" {% if plant=="IN01" %}selected{% endif %}>
+                    IN01
+                </option>
+
+                <option value="SG01" {% if plant=="SG01" %}selected{% endif %}>
+                    SG01
+                </option>
+
+                <option value="US01" {% if plant=="US01" %}selected{% endif %}>
+                    US01
+                </option>
+
+                <option value="GR01" {% if plant=="GR01" %}selected{% endif %}>
+                    GR01
+                </option>
+
+            </select>
+        </div>
+
+        <!-- Price -->
+        <div class="mb-3">
+            <label class="form-label">Price</label>
+
+            <input type="number" name="price" class="form-control" value="{{ price or '' }}" min="0" step="0.01"
+                required>
+        </div>
+
+        <!-- Status -->
+        <div class="mb-3">
+            <label class="form-label">Status</label>
+
+            <select name="status" class="form-select" required>
+
+                <option value="Available" {% if status=="Available" %}selected{% endif %}>
+                    Available
+                </option>
+
+                <option value="Out of Stock" {% if status=="Out of Stock" %}selected{% endif %}>
+                    Out of Stock
+                </option>
+
+            </select>
+        </div>
+
+        <!-- Buttons -->
+        <button type="submit" class="btn btn-success">
+            Create Material
+        </button>
+
+        <a href="{{ url_for(
+            'materials',
+            search=search,
+            category=category_filter,
+            plant=plant_filter,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page
+        ) }}" class="btn btn-secondary">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}
