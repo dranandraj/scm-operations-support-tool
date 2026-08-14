@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h1 class="mb-4">Edit Sales Order</h1>
+
+    {% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+
+        <!-- Preserve list state -->
+
+        <input type="hidden" name="search" value="{{ search or '' }}">
+        <input type="hidden" name="status_filter" value="{{ status_filter or '' }}">
+        <input type="hidden" name="sort_by" value="{{ sort_by or 'order_id' }}">
+        <input type="hidden" name="sort_order" value="{{ sort_order or 'asc' }}">
+        <input type="hidden" name="page" value="{{ page or '1' }}">
+        <input type="hidden" name="per_page" value="{{ per_page or '10' }}">
+
+
+        <!-- Sales Order ID -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Sales Order ID
+            </label>
+
+            <input type="text" class="form-control" value="{{ sales_order[0] }}" readonly>
+
+        </div>
+
+
+        <!-- Customer -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Customer ID
+            </label>
+
+            <select name="customer_id" class="form-select" required>
+
+                <option value="">Select Customer</option>
+
+                {% for customer in customers %}
+                <option value="{{ customer[0] }}" {% if customer[0]==sales_order[1] %}selected{% endif %}>
+                    {{ customer[0] }}
+                </option>
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- Material -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Material ID
+            </label>
+
+            <select name="material_id" class="form-select" required>
+
+                <option value="">Select Material</option>
+
+                {% for material in materials %}
+                <option value="{{ material[0] }}" {% if material[0]==sales_order[2] %}selected{% endif %}>
+                    {{ material[0] }}
+                </option>
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- Quantity -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Quantity
+            </label>
+
+            <input type="number" name="quantity" class="form-control" value="{{ sales_order[3] }}" min="1" required>
+
+        </div>
+
+
+        <!-- Status -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Status
+            </label>
+
+            <select name="status" class="form-select" required>
+
+                <option value="Pending" {% if sales_order[4]=="Pending" %}selected{% endif %}>
+                    Pending
+                </option>
+
+                <option value="Shipped" {% if sales_order[4]=="Shipped" %}selected{% endif %}>
+                    Shipped
+                </option>
+
+                <option value="Delivered" {% if sales_order[4]=="Delivered" %}selected{% endif %}>
+                    Delivered
+                </option>
+
+                <option value="Cancelled" {% if sales_order[4]=="Cancelled" %}selected{% endif %}>
+                    Cancelled
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Order Date -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Order Date
+            </label>
+
+            <input type="date" name="order_date" class="form-control" value="{{ sales_order[5] }}" required>
+
+        </div>
+
+
+        <!-- Buttons -->
+
+        <button type="submit" class="btn btn-primary">
+            Update Sales Order
+        </button>
+
+        <a href="{{ url_for(
+            'sales_orders',
+            search=search,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page
+        ) }}" class="btn btn-secondary">
+
+            Cancel
+
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

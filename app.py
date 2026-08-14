@@ -2,10 +2,20 @@ import io
 import csv
 import openpyxl
 from openpyxl import Workbook
-from flask import Flask, make_response, render_template, request, send_file, redirect, url_for, Response
+from flask import (
+    Flask,
+    make_response,
+    render_template,
+    request,
+    send_file,
+    redirect,
+    url_for,
+    Response,
+)
 from modules.db import get_connection
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
@@ -33,8 +43,9 @@ def home():
         customers_count=customers_count,
         materials_count=materials_count,
         sales_orders_count=sales_orders_count,
-        support_requests_count=support_requests_count
+        support_requests_count=support_requests_count,
     )
+
 
 @app.route("/customers")
 def customers():
@@ -63,7 +74,7 @@ def customers():
         "customer_id": "customer_id",
         "customer_name": "CAST(REGEXP_REPLACE(customer_name, '[^0-9]', '', 'g') AS INTEGER)",
         "country": "country",
-        "status": "status"
+        "status": "status",
     }
 
     # Prevent invalid column names
@@ -98,12 +109,7 @@ def customers():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"])
 
     # Country filter
     if country:
@@ -135,12 +141,9 @@ def customers():
             )
         """
 
-        count_params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        count_params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # Country filter for count
     if country:
@@ -157,10 +160,7 @@ def customers():
     total_records = cursor.fetchone()[0]
 
     # Calculate total pages
-    total_pages = max(
-        1,
-        (total_records + per_page - 1) // per_page
-    )
+    total_pages = max(1, (total_records + per_page - 1) // per_page)
 
     # Prevent invalid page number
     if page > total_pages:
@@ -175,10 +175,7 @@ def customers():
         LIMIT %s OFFSET %s
     """
 
-    params.extend([
-        per_page,
-        offset
-    ])
+    params.extend([per_page, offset])
 
     cursor.execute(query, params)
 
@@ -199,8 +196,9 @@ def customers():
         per_page=per_page,
         total_records=total_records,
         total_pages=total_pages,
-        current_endpoint="customers"
+        current_endpoint="customers",
     )
+
 
 @app.route("/customers/create", methods=["GET", "POST"])
 def create_customer():
@@ -247,7 +245,7 @@ def create_customer():
                 sort_by=sort_by,
                 sort_order=sort_order,
                 per_page=per_page,
-                page=page
+                page=page,
             )
 
         connection = get_connection()
@@ -263,7 +261,7 @@ def create_customer():
             FROM customers
             WHERE customer_id = %s
             """,
-            (customer_id,)
+            (customer_id,),
         )
 
         existing_customer = cursor.fetchone()
@@ -286,7 +284,7 @@ def create_customer():
                 sort_by=sort_by,
                 sort_order=sort_order,
                 per_page=per_page,
-                page=page
+                page=page,
             )
 
         # -----------------------------------
@@ -300,12 +298,7 @@ def create_customer():
             VALUES
                 (%s, %s, %s, %s)
             """,
-            (
-                customer_id,
-                customer_name,
-                country,
-                status
-            )
+            (customer_id, customer_name, country, status),
         )
 
         connection.commit()
@@ -317,16 +310,18 @@ def create_customer():
         # Return to same filtered/sorted page
         # -----------------------------------
 
-        return redirect(url_for(
-            "customers",
-            search=search,
-            country=country_filter,
-            status=status_filter,
-            sort_by=sort_by,
-            sort_order=sort_order,
-            per_page=per_page,
-            page=page
-        ))
+        return redirect(
+            url_for(
+                "customers",
+                search=search,
+                country=country_filter,
+                status=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                per_page=per_page,
+                page=page,
+            )
+        )
 
     # -----------------------------------
     # GET - Show create form
@@ -340,8 +335,9 @@ def create_customer():
         sort_by=sort_by,
         sort_order=sort_order,
         per_page=per_page,
-        page=page
+        page=page,
     )
+
 
 @app.route("/customers/<customer_id>/edit", methods=["GET", "POST"])
 def edit_customer(customer_id):
@@ -367,14 +363,17 @@ def edit_customer(customer_id):
 
     if request.method == "GET":
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT customer_id,
                    customer_name,
                    country,
                    status
             FROM customers
             WHERE customer_id = %s
-        """, (customer_id,))
+        """,
+            (customer_id,),
+        )
 
         customer = cursor.fetchone()
 
@@ -393,7 +392,7 @@ def edit_customer(customer_id):
             sort_by=sort_by,
             sort_order=sort_order,
             per_page=per_page,
-            page=page
+            page=page,
         )
 
     # -----------------------------------
@@ -407,14 +406,17 @@ def edit_customer(customer_id):
     # Validation
     if not customer_name or not new_country or not new_status:
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT customer_id,
                    customer_name,
                    country,
                    status
             FROM customers
             WHERE customer_id = %s
-        """, (customer_id,))
+        """,
+            (customer_id,),
+        )
 
         customer = cursor.fetchone()
 
@@ -431,25 +433,23 @@ def edit_customer(customer_id):
             sort_by=sort_by,
             sort_order=sort_order,
             per_page=per_page,
-            page=page
+            page=page,
         )
 
     # -----------------------------------
     # Update database
     # -----------------------------------
 
-    cursor.execute("""
+    cursor.execute(
+        """
         UPDATE customers
         SET customer_name = %s,
             country = %s,
             status = %s
         WHERE customer_id = %s
-    """, (
-        customer_name,
-        new_country,
-        new_status,
-        customer_id
-    ))
+    """,
+        (customer_name, new_country, new_status, customer_id),
+    )
 
     connection.commit()
 
@@ -460,16 +460,19 @@ def edit_customer(customer_id):
     # Return to same filtered/sorted page
     # -----------------------------------
 
-    return redirect(url_for(
-        "customers",
-        search=search,
-        country=country,
-        status=status_filter,
-        sort_by=sort_by,
-        sort_order=sort_order,
-        per_page=per_page,
-        page=page
-    ))
+    return redirect(
+        url_for(
+            "customers",
+            search=search,
+            country=country,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            per_page=per_page,
+            page=page,
+        )
+    )
+
 
 @app.route("/customers/<customer_id>/delete", methods=["POST"])
 def delete_customer(customer_id):
@@ -489,10 +492,13 @@ def delete_customer(customer_id):
     connection = get_connection()
     cursor = connection.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         DELETE FROM customers
         WHERE customer_id = %s
-    """, (customer_id,))
+    """,
+        (customer_id,),
+    )
 
     connection.commit()
 
@@ -503,16 +509,19 @@ def delete_customer(customer_id):
     # Return to same filtered/sorted page
     # -----------------------------------
 
-    return redirect(url_for(
-        "customers",
-        search=search,
-        country=country,
-        status=status_filter,
-        sort_by=sort_by,
-        sort_order=sort_order,
-        per_page=per_page,
-        page=page
-    ))
+    return redirect(
+        url_for(
+            "customers",
+            search=search,
+            country=country,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            per_page=per_page,
+            page=page,
+        )
+    )
+
 
 @app.route("/customers/export/csv")
 def export_customers_csv():
@@ -529,7 +538,7 @@ def export_customers_csv():
         "customer_id": "customer_id",
         "customer_name": "CAST(REGEXP_REPLACE(customer_name, '[^0-9]', '', 'g') AS INTEGER)",
         "country": "country",
-        "status": "status"
+        "status": "status",
     }
 
     order_column = sort_options.get(sort_by, "customer_id")
@@ -561,12 +570,7 @@ def export_customers_csv():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"])
 
     # Country filter
     if country:
@@ -591,24 +595,18 @@ def export_customers_csv():
     output = io.StringIO()
     writer = csv.writer(output)
 
-    writer.writerow([
-        "Customer ID",
-        "Customer Name",
-        "Country",
-        "Status"
-    ])
+    writer.writerow(["Customer ID", "Customer Name", "Country", "Status"])
 
     writer.writerows(rows)
 
     response = make_response(output.getvalue())
 
-    response.headers["Content-Disposition"] = (
-        "attachment; filename=customers.csv"
-    )
+    response.headers["Content-Disposition"] = "attachment; filename=customers.csv"
 
     response.headers["Content-Type"] = "text/csv"
 
     return response
+
 
 @app.route("/customers/export/excel")
 def export_customers_excel():
@@ -625,7 +623,7 @@ def export_customers_excel():
         "customer_id": "customer_id",
         "customer_name": "CAST(REGEXP_REPLACE(customer_name, '[^0-9]', '', 'g') AS INTEGER)",
         "country": "country",
-        "status": "status"
+        "status": "status",
     }
 
     order_column = sort_options.get(sort_by, "customer_id")
@@ -657,12 +655,7 @@ def export_customers_excel():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"])
 
     # Country filter
     if country:
@@ -690,12 +683,7 @@ def export_customers_excel():
     worksheet.title = "Customers"
 
     # Header
-    worksheet.append([
-        "Customer ID",
-        "Customer Name",
-        "Country",
-        "Status"
-    ])
+    worksheet.append(["Customer ID", "Customer Name", "Country", "Status"])
 
     # Data
     for row in rows:
@@ -708,10 +696,7 @@ def export_customers_excel():
 
         for cell in column:
             if cell.value is not None:
-                max_length = max(
-                    max_length,
-                    len(str(cell.value))
-                )
+                max_length = max(max_length, len(str(cell.value)))
 
         worksheet.column_dimensions[column_letter].width = max_length + 2
 
@@ -724,8 +709,9 @@ def export_customers_excel():
         output,
         as_attachment=True,
         download_name="customers.xlsx",
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
+
 
 @app.route("/materials")
 def materials():
@@ -758,7 +744,7 @@ def materials():
         "category": "category",
         "plant": "plant",
         "price": "price",
-        "status": "status"
+        "status": "status",
     }
 
     # Prevent invalid column names
@@ -794,13 +780,9 @@ def materials():
             )
         """
 
-        count_params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        count_params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # Category filter
     if category:
@@ -825,10 +807,7 @@ def materials():
     # Calculate total pages
     # -----------------------------------
 
-    total_pages = max(
-        1,
-        (total_records + per_page - 1) // per_page
-    )
+    total_pages = max(1, (total_records + per_page - 1) // per_page)
 
     # Prevent invalid page number
     if page > total_pages:
@@ -865,13 +844,9 @@ def materials():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # Category filter
     if category:
@@ -894,10 +869,7 @@ def materials():
         LIMIT %s OFFSET %s
     """
 
-    params.extend([
-        per_page,
-        offset
-    ])
+    params.extend([per_page, offset])
 
     cursor.execute(query, params)
 
@@ -918,8 +890,9 @@ def materials():
         page=page,
         per_page=per_page,
         total_records=total_records,
-        total_pages=total_pages
+        total_pages=total_pages,
     )
+
 
 @app.route("/materials/create", methods=["GET", "POST"])
 def create_material():
@@ -954,7 +927,14 @@ def create_material():
         per_page = request.form.get("per_page", per_page)
 
         # Basic validation
-        if not material_id or not material_name or not category or not plant or not price or not status:
+        if (
+            not material_id
+            or not material_name
+            or not category
+            or not plant
+            or not price
+            or not status
+        ):
             return render_template(
                 "material_form.html",
                 error="All fields are required.",
@@ -971,7 +951,7 @@ def create_material():
                 sort_by=sort_by,
                 sort_order=sort_order,
                 page=page,
-                per_page=per_page
+                per_page=per_page,
             )
 
         # Price validation
@@ -994,7 +974,7 @@ def create_material():
                 sort_by=sort_by,
                 sort_order=sort_order,
                 page=page,
-                per_page=per_page
+                per_page=per_page,
             )
 
         connection = get_connection()
@@ -1002,8 +982,7 @@ def create_material():
 
         # Check duplicate Material ID
         cursor.execute(
-            "SELECT material_id FROM materials WHERE material_id = %s",
-            (material_id,)
+            "SELECT material_id FROM materials WHERE material_id = %s", (material_id,)
         )
 
         existing_material = cursor.fetchone()
@@ -1028,7 +1007,7 @@ def create_material():
                 sort_by=sort_by,
                 sort_order=sort_order,
                 page=page,
-                per_page=per_page
+                per_page=per_page,
             )
 
         # Insert material
@@ -1039,14 +1018,7 @@ def create_material():
             VALUES
                 (%s, %s, %s, %s, %s, %s)
             """,
-            (
-                material_id,
-                material_name,
-                category,
-                plant,
-                price,
-                status
-            )
+            (material_id, material_name, category, plant, price, status),
         )
 
         connection.commit()
@@ -1055,17 +1027,19 @@ def create_material():
         connection.close()
 
         # Return to Materials with previous filter/sort state
-        return redirect(url_for(
-            "materials",
-            search=search,
-            category=category_filter,
-            plant=plant_filter,
-            status=status_filter,
-            sort_by=sort_by,
-            sort_order=sort_order,
-            page=page,
-            per_page=per_page
-        ))
+        return redirect(
+            url_for(
+                "materials",
+                search=search,
+                category=category_filter,
+                plant=plant_filter,
+                status=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                page=page,
+                per_page=per_page,
+            )
+        )
 
     return render_template(
         "material_form.html",
@@ -1076,8 +1050,9 @@ def create_material():
         sort_by=sort_by,
         sort_order=sort_order,
         page=page,
-        per_page=per_page
+        per_page=per_page,
     )
+
 
 @app.route("/materials/<material_id>/edit", methods=["GET", "POST"])
 def edit_material(material_id):
@@ -1104,7 +1079,8 @@ def edit_material(material_id):
 
     if request.method == "GET":
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT material_id,
                    material_name,
                    category,
@@ -1113,7 +1089,9 @@ def edit_material(material_id):
                    status
             FROM materials
             WHERE material_id = %s
-        """, (material_id,))
+        """,
+            (material_id,),
+        )
 
         material = cursor.fetchone()
 
@@ -1133,7 +1111,7 @@ def edit_material(material_id):
             sort_by=sort_by,
             sort_order=sort_order,
             page=page,
-            per_page=per_page
+            per_page=per_page,
         )
 
     # -----------------------------------
@@ -1162,7 +1140,8 @@ def edit_material(material_id):
 
     if not material_name or not category or not plant or not price or not status:
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT material_id,
                    material_name,
                    category,
@@ -1171,7 +1150,9 @@ def edit_material(material_id):
                    status
             FROM materials
             WHERE material_id = %s
-        """, (material_id,))
+        """,
+            (material_id,),
+        )
 
         material = cursor.fetchone()
 
@@ -1189,7 +1170,7 @@ def edit_material(material_id):
             sort_by=sort_by,
             sort_order=sort_order,
             page=page,
-            per_page=per_page
+            per_page=per_page,
         )
 
     # -----------------------------------
@@ -1201,7 +1182,8 @@ def edit_material(material_id):
 
     except ValueError:
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT material_id,
                    material_name,
                    category,
@@ -1210,7 +1192,9 @@ def edit_material(material_id):
                    status
             FROM materials
             WHERE material_id = %s
-        """, (material_id,))
+        """,
+            (material_id,),
+        )
 
         material = cursor.fetchone()
 
@@ -1228,14 +1212,15 @@ def edit_material(material_id):
             sort_by=sort_by,
             sort_order=sort_order,
             page=page,
-            per_page=per_page
+            per_page=per_page,
         )
 
     # -----------------------------------
     # Update database
     # -----------------------------------
 
-    cursor.execute("""
+    cursor.execute(
+        """
         UPDATE materials
         SET material_name = %s,
             category = %s,
@@ -1243,14 +1228,9 @@ def edit_material(material_id):
             price = %s,
             status = %s
         WHERE material_id = %s
-    """, (
-        material_name,
-        category,
-        plant,
-        price,
-        status,
-        material_id
-    ))
+    """,
+        (material_name, category, plant, price, status, material_id),
+    )
 
     connection.commit()
 
@@ -1261,17 +1241,20 @@ def edit_material(material_id):
     # Return to same filtered/sorted page
     # -----------------------------------
 
-    return redirect(url_for(
-        "materials",
-        search=search,
-        category=category_filter,
-        plant=plant_filter,
-        status=status_filter,
-        sort_by=sort_by,
-        sort_order=sort_order,
-        page=page,
-        per_page=per_page
-    ))
+    return redirect(
+        url_for(
+            "materials",
+            search=search,
+            category=category_filter,
+            plant=plant_filter,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+    )
+
 
 @app.route("/materials/<material_id>/delete", methods=["POST"])
 def delete_material(material_id):
@@ -1300,7 +1283,7 @@ def delete_material(material_id):
         DELETE FROM materials
         WHERE material_id = %s
         """,
-        (material_id,)
+        (material_id,),
     )
 
     connection.commit()
@@ -1312,17 +1295,20 @@ def delete_material(material_id):
     # Return to same filtered/sorted page
     # -----------------------------------
 
-    return redirect(url_for(
-        "materials",
-        search=search,
-        category=category,
-        plant=plant,
-        status=status_filter,
-        sort_by=sort_by,
-        sort_order=sort_order,
-        per_page=per_page,
-        page=page
-    ))
+    return redirect(
+        url_for(
+            "materials",
+            search=search,
+            category=category,
+            plant=plant,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            per_page=per_page,
+            page=page,
+        )
+    )
+
 
 @app.route("/materials/export/csv")
 def export_materials_csv():
@@ -1341,7 +1327,7 @@ def export_materials_csv():
         "category": "category",
         "plant": "plant",
         "price": "price",
-        "status": "status"
+        "status": "status",
     }
 
     order_column = sort_options.get(sort_by, "material_id")
@@ -1374,13 +1360,9 @@ def export_materials_csv():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     if category:
         query += " AND category = %s"
@@ -1406,14 +1388,9 @@ def export_materials_csv():
     output = io.StringIO()
     writer = csv.writer(output)
 
-    writer.writerow([
-        "Material ID",
-        "Material Name",
-        "Category",
-        "Plant",
-        "Price",
-        "Status"
-    ])
+    writer.writerow(
+        ["Material ID", "Material Name", "Category", "Plant", "Price", "Status"]
+    )
 
     writer.writerows(materials)
 
@@ -1422,10 +1399,9 @@ def export_materials_csv():
     return Response(
         output.getvalue(),
         mimetype="text/csv",
-        headers={
-            "Content-Disposition": "attachment; filename=materials.csv"
-        }
+        headers={"Content-Disposition": "attachment; filename=materials.csv"},
     )
+
 
 @app.route("/materials/export/excel")
 def export_materials_excel():
@@ -1437,7 +1413,7 @@ def export_materials_excel():
 
     sort_by = request.args.get("sort_by", "material_id")
     sort_order = request.args.get("sort_order", "asc")
-    
+
     # -----------------------------------
     # Allowed columns for sorting
     # -----------------------------------
@@ -1448,7 +1424,7 @@ def export_materials_excel():
         "category": "category",
         "plant": "plant",
         "price": "price",
-        "status": "status"
+        "status": "status",
     }
 
     # Prevent invalid column names
@@ -1492,13 +1468,9 @@ def export_materials_excel():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # -----------------------------------
     # Category filter
@@ -1546,14 +1518,9 @@ def export_materials_excel():
     worksheet.title = "Materials"
 
     # Header
-    worksheet.append([
-        "Material ID",
-        "Material Name",
-        "Category",
-        "Plant",
-        "Price",
-        "Status"
-    ])
+    worksheet.append(
+        ["Material ID", "Material Name", "Category", "Plant", "Price", "Status"]
+    )
 
     # Data
     for row in rows:
@@ -1570,10 +1537,7 @@ def export_materials_excel():
 
         for cell in column:
             if cell.value is not None:
-                max_length = max(
-                    max_length,
-                    len(str(cell.value))
-                )
+                max_length = max(max_length, len(str(cell.value)))
 
         worksheet.column_dimensions[column_letter].width = max_length + 2
 
@@ -1595,8 +1559,9 @@ def export_materials_excel():
         output,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         as_attachment=True,
-        download_name="materials.xlsx"
+        download_name="materials.xlsx",
     )
+
 
 @app.route("/sales_orders")
 def sales_orders():
@@ -1633,7 +1598,7 @@ def sales_orders():
         "material_id": "material_id",
         "quantity": "quantity",
         "status": "status",
-        "order_date": "order_date"
+        "order_date": "order_date",
     }
 
     # Prevent invalid column names
@@ -1669,13 +1634,9 @@ def sales_orders():
             )
         """
 
-        count_params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        count_params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # Status filter
     if status:
@@ -1690,10 +1651,7 @@ def sales_orders():
     # Calculate total pages
     # -----------------------------------
 
-    total_pages = max(
-        1,
-        (total_count + per_page - 1) // per_page
-    )
+    total_pages = max(1, (total_count + per_page - 1) // per_page)
 
     # Prevent invalid page number
     if page > total_pages:
@@ -1731,13 +1689,9 @@ def sales_orders():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # Status filter
     if status:
@@ -1760,10 +1714,7 @@ def sales_orders():
         LIMIT %s OFFSET %s
     """
 
-    params.extend([
-        per_page,
-        offset
-    ])
+    params.extend([per_page, offset])
 
     cursor.execute(query, params)
 
@@ -1786,8 +1737,611 @@ def sales_orders():
         page=page,
         per_page=per_page,
         total_count=total_count,
-        total_pages=total_pages
+        total_pages=total_pages,
     )
+
+
+@app.route("/sales_orders/create", methods=["GET", "POST"])
+def create_sales_order():
+
+    # -----------------------------------
+    # Preserve filter / sort / pagination
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "order_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    page = request.args.get("page", "1").strip()
+    per_page = request.args.get("per_page", "10").strip()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # -----------------------------------
+    # Get customers and materials
+    # -----------------------------------
+
+    cursor.execute("""
+        SELECT customer_id, customer_name
+        FROM customers
+        ORDER BY customer_id
+    """)
+
+    customers = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT material_id, material_name
+        FROM materials
+        ORDER BY material_id
+    """)
+
+    materials = cursor.fetchall()
+
+    # -----------------------------------
+    # Create Sales Order
+    # -----------------------------------
+
+    if request.method == "POST":
+
+        order_id = request.form.get("order_id", "").strip()
+        customer_id = request.form.get("customer_id", "").strip()
+        material_id = request.form.get("material_id", "").strip()
+        quantity = request.form.get("quantity", "").strip()
+        new_status = request.form.get("status", "").strip()
+        order_date = request.form.get("order_date", "").strip()
+
+        if not all(
+            [order_id, customer_id, material_id, quantity, new_status, order_date]
+        ):
+            cursor.close()
+            connection.close()
+
+            return render_template(
+                "sales_order_form.html",
+                customers=customers,
+                materials=materials,
+                error="All fields are required.",
+                order_id=order_id,
+                customer_id=customer_id,
+                material_id=material_id,
+                quantity=quantity,
+                status=new_status,
+                order_date=order_date,
+                search=search,
+                status_filter=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                page=page,
+                per_page=per_page,
+            )
+
+        try:
+            cursor.execute(
+                """
+                INSERT INTO sales_orders (
+                    order_id,
+                    customer_id,
+                    material_id,
+                    quantity,
+                    status,
+                    order_date
+                )
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+                (
+                    order_id,
+                    customer_id,
+                    material_id,
+                    int(quantity),
+                    new_status,
+                    order_date,
+                ),
+            )
+
+            connection.commit()
+
+        except Exception as e:
+
+            connection.rollback()
+
+            cursor.close()
+            connection.close()
+
+            return render_template(
+                "sales_order_form.html",
+                customers=customers,
+                materials=materials,
+                error=str(e),
+                order_id=order_id,
+                customer_id=customer_id,
+                material_id=material_id,
+                quantity=quantity,
+                status=new_status,
+                order_date=order_date,
+                search=search,
+                status_filter=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                page=page,
+                per_page=per_page,
+            )
+
+        cursor.close()
+        connection.close()
+
+        # -----------------------------------
+        # Return to same filtered/sorted page
+        # -----------------------------------
+
+        return redirect(
+            url_for(
+                "sales_orders",
+                search=search,
+                status=status_filter,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                page=page,
+                per_page=per_page,
+            )
+        )
+
+    cursor.close()
+    connection.close()
+
+    return render_template(
+        "sales_order_form.html",
+        customers=customers,
+        materials=materials,
+        search=search,
+        status_filter=status_filter,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        page=page,
+        per_page=per_page,
+    )
+
+
+@app.route("/sales_orders/<order_id>/edit", methods=["GET", "POST"])
+def edit_sales_order(order_id):
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "order_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    page = request.args.get("page", "1").strip()
+    per_page = request.args.get("per_page", "10").strip()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # -----------------------------------
+    # GET existing sales order
+    # -----------------------------------
+
+    if request.method == "GET":
+
+        cursor.execute(
+            """
+            SELECT order_id,
+                   customer_id,
+                   material_id,
+                   quantity,
+                   status,
+                   order_date
+            FROM sales_orders
+            WHERE order_id = %s
+        """,
+            (order_id,),
+        )
+
+        sales_order = cursor.fetchone()
+
+        # Get existing customers
+        cursor.execute("""
+            SELECT customer_id
+            FROM customers
+            ORDER BY customer_id
+        """)
+
+        customers = cursor.fetchall()
+
+        # Get existing materials
+        cursor.execute("""
+            SELECT material_id
+            FROM materials
+            ORDER BY material_id
+        """)
+
+        materials = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        if not sales_order:
+            return "Sales Order not found", 404
+
+        return render_template(
+            "edit_sales_order.html",
+            sales_order=sales_order,
+            customers=customers,
+            materials=materials,
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # POST - Get updated values
+    # -----------------------------------
+
+    customer_id = request.form.get("customer_id", "").strip()
+    material_id = request.form.get("material_id", "").strip()
+    quantity = request.form.get("quantity", "").strip()
+    new_status = request.form.get("status", "").strip()
+    order_date = request.form.get("order_date", "").strip()
+
+    # -----------------------------------
+    # Get preserved state from hidden fields
+    # -----------------------------------
+
+    search = request.form.get("search", search)
+    status_filter = request.form.get("status_filter", status_filter)
+    sort_by = request.form.get("sort_by", sort_by)
+    sort_order = request.form.get("sort_order", sort_order)
+    page = request.form.get("page", page)
+    per_page = request.form.get("per_page", per_page)
+
+    # -----------------------------------
+    # Validation
+    # -----------------------------------
+
+    if (
+        not customer_id
+        or not material_id
+        or not quantity
+        or not new_status
+        or not order_date
+    ):
+
+        cursor.execute(
+            """
+            SELECT order_id,
+                   customer_id,
+                   material_id,
+                   quantity,
+                   status,
+                   order_date
+            FROM sales_orders
+            WHERE order_id = %s
+        """,
+            (order_id,),
+        )
+
+        sales_order = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT customer_id
+            FROM customers
+            ORDER BY customer_id
+        """)
+
+        customers = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT material_id
+            FROM materials
+            ORDER BY material_id
+        """)
+
+        materials = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "edit_sales_order.html",
+            sales_order=sales_order,
+            customers=customers,
+            materials=materials,
+            error="All fields are required.",
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # Customer ID validation
+    # -----------------------------------
+
+    cursor.execute(
+        """
+        SELECT customer_id
+        FROM customers
+        WHERE customer_id = %s
+    """,
+        (customer_id,),
+    )
+
+    customer_exists = cursor.fetchone()
+
+    if not customer_exists:
+
+        cursor.execute(
+            """
+            SELECT order_id,
+                   customer_id,
+                   material_id,
+                   quantity,
+                   status,
+                   order_date
+            FROM sales_orders
+            WHERE order_id = %s
+        """,
+            (order_id,),
+        )
+
+        sales_order = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT customer_id
+            FROM customers
+            ORDER BY customer_id
+        """)
+
+        customers = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT material_id
+            FROM materials
+            ORDER BY material_id
+        """)
+
+        materials = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "edit_sales_order.html",
+            sales_order=sales_order,
+            customers=customers,
+            materials=materials,
+            error="Selected Customer ID does not exist.",
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # Material ID validation
+    # -----------------------------------
+
+    cursor.execute(
+        """
+        SELECT material_id
+        FROM materials
+        WHERE material_id = %s
+    """,
+        (material_id,),
+    )
+
+    material_exists = cursor.fetchone()
+
+    if not material_exists:
+
+        cursor.execute(
+            """
+            SELECT order_id,
+                   customer_id,
+                   material_id,
+                   quantity,
+                   status,
+                   order_date
+            FROM sales_orders
+            WHERE order_id = %s
+        """,
+            (order_id,),
+        )
+
+        sales_order = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT customer_id
+            FROM customers
+            ORDER BY customer_id
+        """)
+
+        customers = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT material_id
+            FROM materials
+            ORDER BY material_id
+        """)
+
+        materials = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "edit_sales_order.html",
+            sales_order=sales_order,
+            customers=customers,
+            materials=materials,
+            error="Selected Material ID does not exist.",
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # Quantity validation
+    # -----------------------------------
+
+    try:
+        quantity = int(quantity)
+
+        if quantity <= 0:
+            raise ValueError
+
+    except ValueError:
+
+        cursor.execute(
+            """
+            SELECT order_id,
+                   customer_id,
+                   material_id,
+                   quantity,
+                   status,
+                   order_date
+            FROM sales_orders
+            WHERE order_id = %s
+        """,
+            (order_id,),
+        )
+
+        sales_order = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT customer_id
+            FROM customers
+            ORDER BY customer_id
+        """)
+
+        customers = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT material_id
+            FROM materials
+            ORDER BY material_id
+        """)
+
+        materials = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "edit_sales_order.html",
+            sales_order=sales_order,
+            customers=customers,
+            materials=materials,
+            error="Quantity must be a positive number.",
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # Update database
+    # -----------------------------------
+
+    cursor.execute(
+        """
+        UPDATE sales_orders
+        SET customer_id = %s,
+            material_id = %s,
+            quantity = %s,
+            status = %s,
+            order_date = %s
+        WHERE order_id = %s
+    """,
+        (customer_id, material_id, quantity, new_status, order_date, order_id),
+    )
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    # -----------------------------------
+    # Return to same filtered/sorted page
+    # -----------------------------------
+
+    return redirect(
+        url_for(
+            "sales_orders",
+            search=search,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+    )
+
+
+@app.route("/sales_orders/<order_id>/delete", methods=["POST"])
+def delete_sales_order(order_id):
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "order_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    page = request.args.get("page", "1").strip()
+    per_page = request.args.get("per_page", "10").strip()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # -----------------------------------
+    # Delete sales order
+    # -----------------------------------
+
+    cursor.execute(
+        """
+        DELETE FROM sales_orders
+        WHERE order_id = %s
+        """,
+        (order_id,),
+    )
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    # -----------------------------------
+    # Return to same filtered/sorted page
+    # -----------------------------------
+
+    return redirect(
+        url_for(
+            "sales_orders",
+            search=search,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+    )
+
 
 @app.route("/sales_orders/export/csv")
 def export_sales_orders_csv():
@@ -1808,7 +2362,7 @@ def export_sales_orders_csv():
         "material_id": "material_id",
         "quantity": "quantity",
         "status": "status",
-        "order_date": "order_date"
+        "order_date": "order_date",
     }
 
     order_column = sort_options.get(sort_by, "order_id")
@@ -1850,13 +2404,9 @@ def export_sales_orders_csv():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # -----------------------------------
     # Status filter
@@ -1887,14 +2437,16 @@ def export_sales_orders_csv():
 
     writer = csv.writer(output)
 
-    writer.writerow([
-        "Sales Order ID",
-        "Customer ID",
-        "Material ID",
-        "Quantity",
-        "Status",
-        "Order Date"
-    ])
+    writer.writerow(
+        [
+            "Sales Order ID",
+            "Customer ID",
+            "Material ID",
+            "Quantity",
+            "Status",
+            "Order Date",
+        ]
+    )
 
     for row in rows:
         writer.writerow(row)
@@ -1903,16 +2455,12 @@ def export_sales_orders_csv():
     # Return CSV
     # -----------------------------------
 
-    response = Response(
-        output.getvalue(),
-        mimetype="text/csv"
-    )
+    response = Response(output.getvalue(), mimetype="text/csv")
 
-    response.headers["Content-Disposition"] = (
-        "attachment; filename=sales_orders.csv"
-    )
+    response.headers["Content-Disposition"] = "attachment; filename=sales_orders.csv"
 
     return response
+
 
 @app.route("/sales_orders/export/excel")
 def export_sales_orders_excel():
@@ -1933,7 +2481,7 @@ def export_sales_orders_excel():
         "material_id": "material_id",
         "quantity": "quantity",
         "status": "status",
-        "order_date": "order_date"
+        "order_date": "order_date",
     }
 
     order_column = sort_options.get(sort_by, "order_id")
@@ -1975,13 +2523,9 @@ def export_sales_orders_excel():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # -----------------------------------
     # Status filter
@@ -2014,14 +2558,16 @@ def export_sales_orders_excel():
     worksheet.title = "Sales Orders"
 
     # Header
-    worksheet.append([
-        "Sales Order ID",
-        "Customer ID",
-        "Material ID",
-        "Quantity",
-        "Status",
-        "Order Date"
-    ])
+    worksheet.append(
+        [
+            "Sales Order ID",
+            "Customer ID",
+            "Material ID",
+            "Quantity",
+            "Status",
+            "Order Date",
+        ]
+    )
 
     # Data
     for row in rows:
@@ -2039,10 +2585,7 @@ def export_sales_orders_excel():
         for cell in column:
 
             if cell.value is not None:
-                max_length = max(
-                    max_length,
-                    len(str(cell.value))
-                )
+                max_length = max(max_length, len(str(cell.value)))
 
         worksheet.column_dimensions[column_letter].width = max_length + 2
 
@@ -2064,8 +2607,9 @@ def export_sales_orders_excel():
         output,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         as_attachment=True,
-        download_name="sales_orders.xlsx"
+        download_name="sales_orders.xlsx",
     )
+
 
 @app.route("/support_requests")
 def support_requests():
@@ -2095,7 +2639,7 @@ def support_requests():
         "issue_type": "issue_type",
         "description": "description",
         "status": "status",
-        "created_date": "created_date"
+        "created_date": "created_date",
     }
 
     # Prevent invalid column names
@@ -2158,7 +2702,7 @@ def support_requests():
             f"%{search}%",
             f"%{search}%",
             f"%{search}%",
-            f"%{search}%"
+            f"%{search}%",
         ]
 
         params.extend(search_params)
@@ -2188,10 +2732,7 @@ def support_requests():
     # Total Pages
     # -----------------------------------
 
-    total_pages = max(
-        1,
-        (total_records + per_page - 1) // per_page
-    )
+    total_pages = max(1, (total_records + per_page - 1) // per_page)
 
     # Prevent invalid page number
     if page > total_pages:
@@ -2212,10 +2753,7 @@ def support_requests():
         LIMIT %s OFFSET %s
     """
 
-    params.extend([
-        per_page,
-        offset
-    ])
+    params.extend([per_page, offset])
 
     cursor.execute(query, params)
 
@@ -2234,8 +2772,9 @@ def support_requests():
         page=page,
         per_page=per_page,
         total_records=total_records,
-        total_pages=total_pages
+        total_pages=total_pages,
     )
+
 
 @app.route("/support_requests/export/csv")
 def export_support_requests_csv():
@@ -2255,7 +2794,7 @@ def export_support_requests_csv():
         "issue_type": "issue_type",
         "description": "description",
         "status": "status",
-        "created_date": "created_date"
+        "created_date": "created_date",
     }
 
     order_column = sort_options.get(sort_by, "request_id")
@@ -2296,13 +2835,9 @@ def export_support_requests_csv():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # -----------------------------------
     # Status filter
@@ -2333,13 +2868,9 @@ def export_support_requests_csv():
 
     writer = csv.writer(output)
 
-    writer.writerow([
-        "Request ID",
-        "Issue Type",
-        "Description",
-        "Status",
-        "Created Date"
-    ])
+    writer.writerow(
+        ["Request ID", "Issue Type", "Description", "Status", "Created Date"]
+    )
 
     for row in rows:
         writer.writerow(row)
@@ -2348,16 +2879,14 @@ def export_support_requests_csv():
     # Return CSV
     # -----------------------------------
 
-    response = Response(
-        output.getvalue(),
-        mimetype="text/csv"
-    )
+    response = Response(output.getvalue(), mimetype="text/csv")
 
     response.headers["Content-Disposition"] = (
         "attachment; filename=support_requests.csv"
     )
 
     return response
+
 
 @app.route("/support_requests/export/excel")
 def export_support_requests_excel():
@@ -2377,7 +2906,7 @@ def export_support_requests_excel():
         "issue_type": "issue_type",
         "description": "description",
         "status": "status",
-        "created_date": "created_date"
+        "created_date": "created_date",
     }
 
     order_column = sort_options.get(sort_by, "request_id")
@@ -2418,13 +2947,9 @@ def export_support_requests_excel():
             )
         """
 
-        params.extend([
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%",
-            f"%{search}%"
-        ])
+        params.extend(
+            [f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"]
+        )
 
     # -----------------------------------
     # Status filter
@@ -2457,13 +2982,9 @@ def export_support_requests_excel():
     worksheet.title = "Support Requests"
 
     # Header
-    worksheet.append([
-        "Request ID",
-        "Issue Type",
-        "Description",
-        "Status",
-        "Created Date"
-    ])
+    worksheet.append(
+        ["Request ID", "Issue Type", "Description", "Status", "Created Date"]
+    )
 
     # Data
     for row in rows:
@@ -2481,10 +3002,7 @@ def export_support_requests_excel():
         for cell in column:
 
             if cell.value is not None:
-                max_length = max(
-                    max_length,
-                    len(str(cell.value))
-                )
+                max_length = max(max_length, len(str(cell.value)))
 
         worksheet.column_dimensions[column_letter].width = max_length + 2
 
@@ -2506,8 +3024,9 @@ def export_support_requests_excel():
         output,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         as_attachment=True,
-        download_name="support_requests.xlsx"
+        download_name="support_requests.xlsx",
     )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
