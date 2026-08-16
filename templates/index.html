@@ -17,13 +17,19 @@ Dashboard
 
 <div class="row">
 
+    <!-- Customers -->
+
     <div class="col-md-3">
 
         <a href="/customers" class="text-decoration-none text-dark">
 
-            <div class="card text-center">
+            <div class="card text-center dashboard-card">
 
                 <div class="card-body">
+
+                    <div class="dashboard-icon">
+                        👥
+                    </div>
 
                     <h3>{{ customers_count }}</h3>
 
@@ -38,13 +44,19 @@ Dashboard
     </div>
 
 
+    <!-- Materials -->
+
     <div class="col-md-3">
 
         <a href="/materials" class="text-decoration-none text-dark">
 
-            <div class="card text-center">
+            <div class="card text-center dashboard-card">
 
                 <div class="card-body">
+
+                    <div class="dashboard-icon">
+                        📦
+                    </div>
 
                     <h3>{{ materials_count }}</h3>
 
@@ -59,13 +71,19 @@ Dashboard
     </div>
 
 
+    <!-- Sales Orders -->
+
     <div class="col-md-3">
 
         <a href="/sales_orders" class="text-decoration-none text-dark">
 
-            <div class="card text-center">
+            <div class="card text-center dashboard-card">
 
                 <div class="card-body">
+
+                    <div class="dashboard-icon">
+                        🛒
+                    </div>
 
                     <h3>{{ sales_orders_count }}</h3>
 
@@ -80,13 +98,19 @@ Dashboard
     </div>
 
 
+    <!-- Support Requests -->
+
     <div class="col-md-3">
 
         <a href="/support_requests" class="text-decoration-none text-dark">
 
-            <div class="card text-center">
+            <div class="card text-center dashboard-card">
 
                 <div class="card-body">
+
+                    <div class="dashboard-icon">
+                        🎧
+                    </div>
 
                     <h3>{{ support_requests_count }}</h3>
 
@@ -122,7 +146,7 @@ Dashboard
                     Sales Order Status
                 </h4>
 
-                <table class="table table-bordered">
+                <table class="table table-bordered dashboard-recent-table">
 
                     <thead class="table-dark">
 
@@ -143,9 +167,20 @@ Dashboard
 
                         <tr>
 
-                            <td>{{ status }}</td>
+                            <td>
+                                <span class="status-badge status-{{ status | lower | replace(' ', '-') }}">
+                                    {{ status }}
+                                </span>
+                            </td>
 
-                            <td>{{ count }}</td>
+                            <td>
+                                <a href="{{ url_for(
+                                    'sales_orders',
+                                    status=status
+                                ) }}" class="text-decoration-none fw-bold">
+                                    {{ count }}
+                                </a>
+                            </td>
 
                         </tr>
 
@@ -184,7 +219,7 @@ Dashboard
                     Support Request Status
                 </h4>
 
-                <table class="table table-bordered">
+                <table class="table table-bordered dashboard-recent-table">
 
                     <thead class="table-dark">
 
@@ -205,9 +240,20 @@ Dashboard
 
                         <tr>
 
-                            <td>{{ status }}</td>
+                            <td>
+                                <span class="status-badge status-{{ status | lower | replace(' ', '-') }}">
+                                    {{ status }}
+                                </span>
+                            </td>
 
-                            <td>{{ count }}</td>
+                            <td>
+                                <a href="{{ url_for(
+                                    'support_requests',
+                                    status=status
+                                ) }}" class="text-decoration-none fw-bold">
+                                    {{ count }}
+                                </a>
+                            </td>
 
                         </tr>
 
@@ -302,11 +348,19 @@ Dashboard
 
             <div class="card-body">
 
-                <h4 class="mb-3">
-                    Recent Sales Orders
-                </h4>
+                <div class="d-flex justify-content-between align-items-center mb-3">
 
-                <table class="table table-bordered">
+                    <h4 class="mb-0">
+                        Recent Sales Orders
+                    </h4>
+
+                    <a href="{{ url_for('sales_orders') }}" class="btn btn-sm btn-outline-primary">
+                        View All
+                    </a>
+
+                </div>
+
+                <table class="table table-bordered dashboard-recent-table">
 
                     <thead class="table-dark">
 
@@ -331,16 +385,34 @@ Dashboard
 
                         {% for order in recent_sales_orders %}
 
-                        <tr>
+                        <tr class="dashboard-table-row">
 
-                            <td>{{ order[0] }}</td>
+                            <!-- Order ID -->
+                            <td>
+                                <a href="{{ url_for(
+                                    'edit_sales_order',
+                                    order_id=order[0]
+                                ) }}" class="text-decoration-none fw-bold">
 
+                                    {{ order[0] }}
+
+                                </a>
+                            </td>
+
+                            <!-- Customer ID -->
                             <td>{{ order[1] }}</td>
 
+                            <!-- Material ID -->
                             <td>{{ order[2] }}</td>
 
-                            <td>{{ order[3] }}</td>
+                            <!-- Status -->
+                            <td>
+                                <span class="status-badge status-{{ order[3] | lower | replace(' ', '-') }}">
+                                    {{ order[3] }}
+                                </span>
+                            </td>
 
+                            <!-- Order Date -->
                             <td>{{ order[4] }}</td>
 
                         </tr>
@@ -376,11 +448,19 @@ Dashboard
 
             <div class="card-body">
 
-                <h4 class="mb-3">
-                    Recent Support Requests
-                </h4>
+                <div class="d-flex justify-content-between align-items-center mb-3">
 
-                <table class="table table-bordered">
+                    <h4 class="mb-0">
+                        Recent Support Requests
+                    </h4>
+
+                    <a href="{{ url_for('support_requests') }}" class="btn btn-sm btn-outline-primary">
+                        View All
+                    </a>
+
+                </div>
+
+                <table class="table table-bordered dashboard-recent-table">
 
                     <thead class="table-dark">
 
@@ -403,14 +483,31 @@ Dashboard
 
                         {% for request in recent_support_requests %}
 
-                        <tr>
+                        <tr class="dashboard-table-row">
 
-                            <td>{{ request[0] }}</td>
+                            <!-- Request ID -->
+                            <td>
+                                <a href="{{ url_for(
+                                    'edit_support_request',
+                                    request_id=request[0]
+                                ) }}" class="text-decoration-none fw-bold">
 
+                                    {{ request[0] }}
+
+                                </a>
+                            </td>
+
+                            <!-- Issue Type -->
                             <td>{{ request[1] }}</td>
 
-                            <td>{{ request[2] }}</td>
+                            <!-- Status -->
+                            <td>
+                                <span class="status-badge status-{{ request[2] | lower | replace(' ', '-') }}">
+                                    {{ request[2] }}
+                                </span>
+                            </td>
 
+                            <!-- Created Date -->
                             <td>{{ request[3] }}</td>
 
                         </tr>
@@ -455,32 +552,57 @@ Dashboard
 
 <script>
 
-    // -----------------------------------
-    // Get Dashboard Data
-    // -----------------------------------
+    // ===================================
+    // Get chart data from Flask / Jinja
+    // ===================================
 
     const dashboardData = document.getElementById("dashboardData");
 
-    const salesOrderData = JSON.parse(
+    const salesOrderStatus = JSON.parse(
         dashboardData.dataset.salesOrderStatus
     );
 
-    const supportRequestData = JSON.parse(
+    const supportRequestStatus = JSON.parse(
         dashboardData.dataset.supportRequestStatus
     );
 
 
-    // -----------------------------------
-    // Sales Order Status Chart
-    // -----------------------------------
+    // ===================================
+    // Sales Order Chart
+    // ===================================
 
-    const salesOrderLabels = salesOrderData.map(
+    const salesOrderLabels = salesOrderStatus.map(
         item => item[0]
     );
 
-    const salesOrderCounts = salesOrderData.map(
+    const salesOrderCounts = salesOrderStatus.map(
         item => item[1]
     );
+
+
+    // Status-based colors
+
+    const salesOrderColors = salesOrderLabels.map(status => {
+
+        switch (status.toLowerCase()) {
+
+            case "cancelled":
+                return "#dc3545";
+
+            case "delivered":
+                return "#198754";
+
+            case "pending":
+                return "#ffc107";
+
+            case "shipped":
+                return "#0dcaf0";
+
+            default:
+                return "#6c757d";
+        }
+
+    });
 
 
     new Chart(
@@ -495,12 +617,31 @@ Dashboard
                     {
                         label: "Sales Orders",
 
-                        data: salesOrderCounts
+                        data: salesOrderCounts,
+
+                        backgroundColor: [
+                            '#dc3545',
+                            '#198754',
+                            '#ffc107',
+                            '#0dcaf0'
+                        ],
+
+                        hoverBackgroundColor: [
+                            '#b02a37',
+                            '#146c43',
+                            '#cc9a06',
+                            '#0aa2c0'
+                        ],
+
+                        borderWidth: 0,
+                        hoverBorderWidth: 3,
+                        hoverBorderColor: '#212529'
                     }
                 ]
             },
 
             options: {
+
                 responsive: true,
 
                 plugins: {
@@ -510,30 +651,78 @@ Dashboard
                 },
 
                 scales: {
+
                     y: {
                         beginAtZero: true,
 
                         ticks: {
-                            stepSize: 5
+                            precision: 0
                         }
                     }
+
+                },
+
+                onClick: function (event, elements) {
+
+                    if (elements.length > 0) {
+
+                        const index = elements[0].index;
+
+                        const status = salesOrderLabels[index];
+
+                        window.location.href =
+                            "/sales_orders?status=" +
+                            encodeURIComponent(status);
+                    }
+                },
+
+                onHover: function (event, elements) {
+
+                    event.native.target.style.cursor =
+                        elements.length ? "pointer" : "default";
                 }
+
             }
         }
     );
 
 
-    // -----------------------------------
-    // Support Request Status Chart
-    // -----------------------------------
+    // ===================================
+    // Support Request Chart
+    // ===================================
 
-    const supportRequestLabels = supportRequestData.map(
+    const supportRequestLabels = supportRequestStatus.map(
         item => item[0]
     );
 
-    const supportRequestCounts = supportRequestData.map(
+    const supportRequestCounts = supportRequestStatus.map(
         item => item[1]
     );
+
+
+    // Status-based colors
+
+    const supportRequestColors = supportRequestLabels.map(status => {
+
+        switch (status.toLowerCase()) {
+
+            case "closed":
+                return "#6c757d";
+
+            case "in progress":
+                return "#0dcaf0";
+
+            case "open":
+                return "#198754";
+
+            case "resolved":
+                return "#ffc107";
+
+            default:
+                return "#6c757d";
+        }
+
+    });
 
 
     new Chart(
@@ -548,12 +737,31 @@ Dashboard
                     {
                         label: "Support Requests",
 
-                        data: supportRequestCounts
+                        data: supportRequestCounts,
+
+                        backgroundColor: [
+                            '#6c757d',
+                            '#0dcaf0',
+                            '#198754',
+                            '#ffc107'
+                        ],
+
+                        hoverBackgroundColor: [
+                            '#565e64',
+                            '#0aa2c0',
+                            '#146c43',
+                            '#cc9a06'
+                        ],
+
+                        borderWidth: 0,
+                        hoverBorderWidth: 3,
+                        hoverBorderColor: '#212529'
                     }
                 ]
             },
 
             options: {
+
                 responsive: true,
 
                 plugins: {
@@ -563,14 +771,37 @@ Dashboard
                 },
 
                 scales: {
+
                     y: {
                         beginAtZero: true,
 
                         ticks: {
-                            stepSize: 5
+                            precision: 0
                         }
                     }
+
+                },
+
+                onClick: function (event, elements) {
+
+                    if (elements.length > 0) {
+
+                        const index = elements[0].index;
+
+                        const status = supportRequestLabels[index];
+
+                        window.location.href =
+                            "/support_requests?status=" +
+                            encodeURIComponent(status);
+                    }
+                },
+
+                onHover: function (event, elements) {
+
+                    event.native.target.style.cursor =
+                        elements.length ? "pointer" : "default";
                 }
+
             }
         }
     );

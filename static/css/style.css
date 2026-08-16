@@ -25,3 +25,608 @@
     margin-top: 25px;
     margin-bottom: 25px;
 }
+
+/* ===================================
+   Status Badges
+   =================================== */
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Open */
+
+.status-open {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+/* In Progress */
+
+.status-in-progress {
+    background-color: #cff4fc;
+    color: #055160;
+}
+
+/* Resolved */
+
+.status-resolved {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+
+/* Closed */
+
+.status-closed {
+    background-color: #e2e3e5;
+    color: #41464b;
+}
+
+/* Sales Order statuses */
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+
+.status-shipped {
+    background-color: #cff4fc;
+    color: #055160;
+}
+
+.status-delivered {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-cancelled {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+/* ===================================
+   Dashboard Cards
+   =================================== */
+
+.dashboard-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-card h3 {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.dashboard-card p {
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+/* Dashboard Summary Cards Hover Effect */
+
+.dashboard-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Dashboard Recent Activity Table Hover */
+
+.dashboard-table-row {
+    transition: background-color 0.2s ease;
+}
+
+.dashboard-table-row:hover {
+    background-color: #f8f9fa;
+}
+
+/* Dashboard Summary Card Icons */
+
+.dashboard-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.dashboard-card h3 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.dashboard-card p {
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+/* Dashboard Card Labels */
+
+.dashboard-card p {
+    margin-bottom: 0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.dashboard-card:nth-child(1) p {
+    color: #0d6efd;
+}
+
+.dashboard-card:nth-child(2) p {
+    color: #6f42c1;
+}
+
+.dashboard-card:nth-child(3) p {
+    color: #fd7e14;
+}
+
+.dashboard-card:nth-child(4) p {
+    color: #198754;
+}
+
+/* Dashboard Table Row Hover */
+
+.dashboard-recent-table tbody tr>td {
+    transition: background-color 0.2s ease;
+}
+
+.dashboard-recent-table tbody tr:hover>td {
+    background-color: #eef4ff !important;
+}
+
+/* Strong Dashboard Recent Table Hover */
+
+.dashboard-recent-table tbody tr:hover td {
+    background-color: #eef4ff !important;
+    cursor: pointer;
+}
+
+.dashboard-recent-table tbody tr:hover a {
+    position: relative;
+    z-index: 2;
+}
+
+/* ===================================
+   Customers / Data Table Polish
+   =================================== */
+
+.dashboard-data-table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Table row hover */
+.dashboard-data-table tbody tr {
+    transition: background-color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.dashboard-data-table tbody tr:hover {
+    background-color: #f5f7fa;
+}
+
+/* Table links */
+.dashboard-data-table tbody a {
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.dashboard-data-table tbody a:hover {
+    text-decoration: underline;
+}
+
+/* Table header */
+.dashboard-data-table thead th {
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* Action buttons */
+.dashboard-data-table .btn {
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.dashboard-data-table .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Customers Table Row Hover */
+.customers-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.customers-table tbody tr:hover {
+    background-color: #f5f7fa !important;
+}
+
+/* ===================================
+   Customer Action Button Hover
+   =================================== */
+
+.customers-table .btn {
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.customers-table .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* ===================================
+   Materials Action Button Hover
+   =================================== */
+
+.materials-table .btn {
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.materials-table .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* ===================================
+   Sales Orders Action Button Hover
+   =================================== */
+
+.sales-orders-table .btn {
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.sales-orders-table .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+
+/* ===================================
+   Support Requests Action Button Hover
+   =================================== */
+
+.support-requests-table .btn {
+    width: 80px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.support-requests-table .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* ===================================
+   Common Action Buttons
+   =================================== */
+
+.customers-table .btn,
+.materials-table .btn,
+.sales-orders-table .btn,
+.support-requests-table .btn {
+    min-width: 80px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.customers-table .btn:hover,
+.materials-table .btn:hover,
+.sales-orders-table .btn:hover,
+.support-requests-table .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* ===================================
+   Top Action Buttons Hover Effect
+   =================================== */
+
+button,
+a.btn {
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+button:hover,
+a.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* Reset button hover for Sales Orders & Support Requests */
+
+input[type="reset"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+input[type="reset"] {
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+/* Reset Button Hover */
+
+.reset-button {
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.reset-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* ===================================
+   Search / Filter Controls
+   =================================== */
+
+input[type="text"],
+input[type="date"],
+select {
+    transition: border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    outline: none;
+}
+
+
+/* Search / Filter Buttons */
+
+button[type="submit"],
+.search-button {
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+button[type="submit"]:hover,
+.search-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* ===================================
+   Sortable Table Header Polish
+   =================================== */
+
+table thead th a {
+    transition: opacity 0.15s ease,
+        background-color 0.15s ease;
+}
+
+table thead th a:hover {
+    opacity: 0.85;
+    text-decoration: none;
+}
+
+/* Sortable header cursor */
+
+table thead th a {
+    cursor: pointer;
+}
+
+/* ===================================
+   Form Controls Polish
+   =================================== */
+
+.form-control,
+.form-select {
+    transition: border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    outline: none;
+}
+
+
+/* Form Buttons */
+
+form button,
+form .btn {
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+form button:hover,
+form .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* ===================================
+   Responsive Design
+   =================================== */
+
+@media (max-width: 768px) {
+
+    /* Navbar */
+    .navbar .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .navbar-nav {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    /* Dashboard cards */
+    .dashboard-card {
+        margin-bottom: 15px;
+    }
+
+    /* Tables */
+    .table-container {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    table {
+        min-width: 700px;
+    }
+
+    /* Search / Filter area */
+    form {
+        width: 100%;
+    }
+
+    input,
+    select {
+        max-width: 100%;
+    }
+
+    /* Buttons */
+    .btn {
+        margin-bottom: 5px;
+    }
+
+    /* Dashboard charts */
+    .chart-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+}
+
+
+/* Small mobile screens */
+@media (max-width: 576px) {
+
+    /* Page spacing */
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    /* Headings */
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    /* Dashboard */
+    .dashboard-card h3 {
+        font-size: 1.8rem;
+    }
+
+    /* Buttons */
+    .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    /* Tables */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 700px;
+    }
+
+    /* Search controls */
+    input,
+    select {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+
+/* ===================================
+   Add / Edit Form Polish
+   =================================== */
+
+/* Form labels */
+
+form label {
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+
+/* Form spacing */
+
+form .mb-3 {
+    margin-bottom: 18px !important;
+}
+
+
+/* Textarea */
+
+form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+
+/* Form buttons */
+
+form button,
+form a.btn {
+    min-width: 120px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+form button:hover,
+form a.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+
+/* Error message */
+
+.alert-danger {
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+
+/* Form card-like spacing */
+
+form {
+    max-width: 800px;
+}
