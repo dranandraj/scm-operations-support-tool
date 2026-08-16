@@ -6,59 +6,576 @@ Dashboard
 
 {% block content %}
 
-    <h1 class="mb-4">
-        SCM Operations Support Tool
-    </h1>
+<h1 class="mb-4">
+    SCM Operations Support Tool
+</h1>
 
-    <div class="row">
 
-        <div class="col-md-3">
-            <a href="/customers" class="text-decoration-none text-dark">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h3> {{ customers_count }}</h3>
-                        <p>Customers</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        
-    
-        <div class="col-md-3">
-            <a href="/materials" class="text-decoration-none text-dark">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h3> {{ materials_count }}</h3>
-                        <p>Materials</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-    
-    
+<!-- ===================================
+     Summary Cards
+     =================================== -->
 
-        <div class="col-md-3">
-            <a href="/sales_orders" class="text-decoration-none text-dark">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h3> {{ sales_orders_count }}</h3>
-                        <p>Sales Orders</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-    
+<div class="row">
 
-        <div class="col-md-3">
-            <a href="/support_requests" class="text-decoration-none text-dark">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h3> {{ support_requests_count }}</h3>
-                        <p>Support Requests</p>
-                    </div>
+    <div class="col-md-3">
+
+        <a href="/customers" class="text-decoration-none text-dark">
+
+            <div class="card text-center">
+
+                <div class="card-body">
+
+                    <h3>{{ customers_count }}</h3>
+
+                    <p>Customers</p>
+
                 </div>
-            </a>
-        </div>
-    
+
+            </div>
+
+        </a>
+
     </div>
+
+
+    <div class="col-md-3">
+
+        <a href="/materials" class="text-decoration-none text-dark">
+
+            <div class="card text-center">
+
+                <div class="card-body">
+
+                    <h3>{{ materials_count }}</h3>
+
+                    <p>Materials</p>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-md-3">
+
+        <a href="/sales_orders" class="text-decoration-none text-dark">
+
+            <div class="card text-center">
+
+                <div class="card-body">
+
+                    <h3>{{ sales_orders_count }}</h3>
+
+                    <p>Sales Orders</p>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-md-3">
+
+        <a href="/support_requests" class="text-decoration-none text-dark">
+
+            <div class="card text-center">
+
+                <div class="card-body">
+
+                    <h3>{{ support_requests_count }}</h3>
+
+                    <p>Support Requests</p>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================
+     Status Tables
+     =================================== -->
+
+<div class="row mt-4">
+
+
+    <!-- Sales Order Status -->
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h4 class="mb-3">
+                    Sales Order Status
+                </h4>
+
+                <table class="table table-bordered">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>Status</th>
+
+                            <th>Count</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for status, count in sales_order_status %}
+
+                        <tr>
+
+                            <td>{{ status }}</td>
+
+                            <td>{{ count }}</td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td colspan="2">
+                                No sales orders found
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Support Request Status -->
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h4 class="mb-3">
+                    Support Request Status
+                </h4>
+
+                <table class="table table-bordered">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>Status</th>
+
+                            <th>Count</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for status, count in support_request_status %}
+
+                        <tr>
+
+                            <td>{{ status }}</td>
+
+                            <td>{{ count }}</td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td colspan="2">
+                                No support requests found
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================
+     Status Charts
+     =================================== -->
+
+<div class="row mt-4">
+
+
+    <!-- Sales Order Chart -->
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h4 class="mb-3">
+                    Sales Order Status Chart
+                </h4>
+
+                <canvas id="salesOrderChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Support Request Chart -->
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h4 class="mb-3">
+                    Support Request Status Chart
+                </h4>
+
+                <canvas id="supportRequestChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================
+     Recent Activity
+     =================================== -->
+
+<div class="row mt-4">
+
+
+    <!-- Recent Sales Orders -->
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h4 class="mb-3">
+                    Recent Sales Orders
+                </h4>
+
+                <table class="table table-bordered">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>Order ID</th>
+
+                            <th>Customer ID</th>
+
+                            <th>Material ID</th>
+
+                            <th>Status</th>
+
+                            <th>Order Date</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for order in recent_sales_orders %}
+
+                        <tr>
+
+                            <td>{{ order[0] }}</td>
+
+                            <td>{{ order[1] }}</td>
+
+                            <td>{{ order[2] }}</td>
+
+                            <td>{{ order[3] }}</td>
+
+                            <td>{{ order[4] }}</td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td colspan="5">
+                                No sales orders found
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Recent Support Requests -->
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h4 class="mb-3">
+                    Recent Support Requests
+                </h4>
+
+                <table class="table table-bordered">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>Request ID</th>
+
+                            <th>Issue Type</th>
+
+                            <th>Status</th>
+
+                            <th>Created Date</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for request in recent_support_requests %}
+
+                        <tr>
+
+                            <td>{{ request[0] }}</td>
+
+                            <td>{{ request[1] }}</td>
+
+                            <td>{{ request[2] }}</td>
+
+                            <td>{{ request[3] }}</td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td colspan="4">
+                                No support requests found
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================
+     Dashboard Chart Data
+     =================================== -->
+
+<div id="dashboardData" data-sales-order-status="{{ sales_order_status | tojson | forceescape }}"
+    data-support-request-status="{{ support_request_status | tojson | forceescape }}"></div>
+
+
+<!-- Chart.js -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+    // -----------------------------------
+    // Get Dashboard Data
+    // -----------------------------------
+
+    const dashboardData = document.getElementById("dashboardData");
+
+    const salesOrderData = JSON.parse(
+        dashboardData.dataset.salesOrderStatus
+    );
+
+    const supportRequestData = JSON.parse(
+        dashboardData.dataset.supportRequestStatus
+    );
+
+
+    // -----------------------------------
+    // Sales Order Status Chart
+    // -----------------------------------
+
+    const salesOrderLabels = salesOrderData.map(
+        item => item[0]
+    );
+
+    const salesOrderCounts = salesOrderData.map(
+        item => item[1]
+    );
+
+
+    new Chart(
+        document.getElementById("salesOrderChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: salesOrderLabels,
+
+                datasets: [
+                    {
+                        label: "Sales Orders",
+
+                        data: salesOrderCounts
+                    }
+                ]
+            },
+
+            options: {
+                responsive: true,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            stepSize: 5
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    // -----------------------------------
+    // Support Request Status Chart
+    // -----------------------------------
+
+    const supportRequestLabels = supportRequestData.map(
+        item => item[0]
+    );
+
+    const supportRequestCounts = supportRequestData.map(
+        item => item[1]
+    );
+
+
+    new Chart(
+        document.getElementById("supportRequestChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: supportRequestLabels,
+
+                datasets: [
+                    {
+                        label: "Support Requests",
+
+                        data: supportRequestCounts
+                    }
+                ]
+            },
+
+            options: {
+                responsive: true,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            stepSize: 5
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+</script>
+
+
 {% endblock %}

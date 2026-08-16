@@ -23,6 +23,10 @@ def home():
     connection = get_connection()
     cursor = connection.cursor()
 
+    # -----------------------------------
+    # Total Counts
+    # -----------------------------------
+
     cursor.execute("SELECT COUNT(*) FROM customers")
     customers_count = cursor.fetchone()[0]
 
@@ -35,6 +39,65 @@ def home():
     cursor.execute("SELECT COUNT(*) FROM support_requests")
     support_requests_count = cursor.fetchone()[0]
 
+    # -----------------------------------
+    # Sales Order Status Summary
+    # -----------------------------------
+
+    cursor.execute("""
+        SELECT status, COUNT(*)
+        FROM sales_orders
+        GROUP BY status
+        ORDER BY status
+    """)
+
+    sales_order_status = cursor.fetchall()
+
+    # -----------------------------------
+    # Support Request Status Summary
+    # -----------------------------------
+
+    cursor.execute("""
+        SELECT status, COUNT(*)
+        FROM support_requests
+        GROUP BY status
+        ORDER BY status
+    """)
+
+    support_request_status = cursor.fetchall()
+
+    # -----------------------------------
+    # Recent Sales Orders
+    # -----------------------------------
+
+    cursor.execute("""
+        SELECT order_id,
+               customer_id,
+               material_id,
+               status,
+               order_date
+        FROM sales_orders
+        ORDER BY order_date DESC, order_id DESC
+        LIMIT 5
+    """)
+
+    recent_sales_orders = cursor.fetchall()
+
+    # -----------------------------------
+    # Recent Support Requests
+    # -----------------------------------
+
+    cursor.execute("""
+        SELECT request_id,
+               issue_type,
+               status,
+               created_date
+        FROM support_requests
+        ORDER BY created_date DESC, request_id DESC
+        LIMIT 5
+    """)
+
+    recent_support_requests = cursor.fetchall()
+
     cursor.close()
     connection.close()
 
@@ -44,6 +107,10 @@ def home():
         materials_count=materials_count,
         sales_orders_count=sales_orders_count,
         support_requests_count=support_requests_count,
+        sales_order_status=sales_order_status,
+        support_request_status=support_request_status,
+        recent_sales_orders=recent_sales_orders,
+        recent_support_requests=recent_support_requests,
     )
 
 
