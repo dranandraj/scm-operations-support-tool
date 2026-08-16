@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Add Support Request{% endblock %}
+
+{% block content %}
+
+<h1>Add Support Request</h1>
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% endif %}
+
+<form method="POST">
+
+    <!-- Preserve filter / sort / pagination state -->
+
+    <input type="hidden" name="search" value="{{ search or '' }}">
+
+    <input type="hidden" name="status_filter" value="{{ status_filter or '' }}">
+
+    <input type="hidden" name="sort_by" value="{{ sort_by or 'request_id' }}">
+
+    <input type="hidden" name="sort_order" value="{{ sort_order or 'asc' }}">
+
+    <input type="hidden" name="page" value="{{ page or '1' }}">
+
+    <input type="hidden" name="per_page" value="{{ per_page or '10' }}">
+
+
+    <!-- Request ID -->
+
+    <div class="mb-3">
+
+        <label for="request_id">
+            Request ID
+        </label>
+
+        <input type="text" id="request_id" name="request_id" class="form-control" placeholder="Example: SR051"
+            value="{{ request_id | default('') }}" required>
+
+    </div>
+
+
+    <!-- Issue Type -->
+
+    <div class="mb-3">
+
+        <label for="issue_type">
+            Issue Type
+        </label>
+
+        <input type="text" id="issue_type" name="issue_type" class="form-control" placeholder="Example: Order Issue"
+            value="{{ issue_type | default('') }}" required>
+
+    </div>
+
+
+    <!-- Description -->
+
+    <div class="mb-3">
+
+        <label for="description">
+            Description
+        </label>
+
+        <textarea id="description" name="description" class="form-control" rows="5"
+            placeholder="Enter issue description" required>{{ description | default('') }}</textarea>
+
+    </div>
+
+
+    <!-- Status -->
+
+    <div class="mb-3">
+
+        <label for="status">
+            Status
+        </label>
+
+        <select id="status" name="status" class="form-select" required>
+
+            <option value="">
+                Select Status
+            </option>
+
+            <option value="Open" {% if status | default('')=="Open" %} selected {% endif %}>
+                Open
+            </option>
+
+            <option value="In Progress" {% if status | default('')=="In Progress" %} selected {% endif %}>
+                In Progress
+            </option>
+
+            <option value="Resolved" {% if status | default('')=="Resolved" %} selected {% endif %}>
+                Resolved
+            </option>
+
+            <option value="Closed" {% if status | default('')=="Closed" %} selected {% endif %}>
+                Closed
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- Created Date -->
+
+    <div class="mb-3">
+
+        <label for="created_date">
+            Created Date
+        </label>
+
+        <input type="date" id="created_date" name="created_date" class="form-control"
+            value="{{ created_date | default('') }}" required>
+
+    </div>
+
+
+    <!-- Buttons -->
+
+    <button type="submit" class="btn btn-success">
+        Add Support Request
+    </button>
+
+
+    <a href="{{ url_for(
+            'support_requests',
+            search=search,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page
+        ) }}" class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>
+
+{% endblock %}

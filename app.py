@@ -2776,6 +2776,379 @@ def support_requests():
     )
 
 
+@app.route("/support_requests/create", methods=["GET", "POST"])
+def create_support_request():
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "request_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    page = request.args.get("page", "1").strip()
+    per_page = request.args.get("per_page", "10").strip()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # -----------------------------------
+    # GET - Show Add Form
+    # -----------------------------------
+
+    if request.method == "GET":
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "support_request_form.html",
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # POST - Get form values
+    # -----------------------------------
+
+    request_id = request.form.get("request_id", "").strip()
+    issue_type = request.form.get("issue_type", "").strip()
+    description = request.form.get("description", "").strip()
+    status = request.form.get("status", "").strip()
+    created_date = request.form.get("created_date", "").strip()
+
+    # -----------------------------------
+    # Get preserved state from hidden fields
+    # -----------------------------------
+
+    search = request.form.get("search", search)
+    status_filter = request.form.get("status_filter", status_filter)
+    sort_by = request.form.get("sort_by", sort_by)
+    sort_order = request.form.get("sort_order", sort_order)
+    page = request.form.get("page", page)
+    per_page = request.form.get("per_page", per_page)
+
+    # -----------------------------------
+    # Validation
+    # -----------------------------------
+
+    if (
+        not request_id
+        or not issue_type
+        or not description
+        or not status
+        or not created_date
+    ):
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "support_request_form.html",
+            error="All fields are required.",
+            request_id=request_id,
+            issue_type=issue_type,
+            description=description,
+            status=status,
+            created_date=created_date,
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # Check duplicate Request ID
+    # -----------------------------------
+
+    cursor.execute(
+        """
+        SELECT 1
+        FROM support_requests
+        WHERE request_id = %s
+        """,
+        (request_id,),
+    )
+
+    existing_request = cursor.fetchone()
+
+    if existing_request:
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "support_request_form.html",
+            error="Request ID already exists. Please enter a different Request ID.",
+            request_id=request_id,
+            issue_type=issue_type,
+            description=description,
+            status=status,
+            created_date=created_date,
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # Insert into database
+    # -----------------------------------
+
+    cursor.execute(
+        """
+        INSERT INTO support_requests (
+            request_id,
+            issue_type,
+            description,
+            status,
+            created_date
+        )
+        VALUES (%s, %s, %s, %s, %s)
+        """,
+        (
+            request_id,
+            issue_type,
+            description,
+            status,
+            created_date,
+        ),
+    )
+
+    connection.commit()
+
+    # -----------------------------------
+    # Return to same filtered/sorted page
+    # -----------------------------------
+
+    return redirect(
+        url_for(
+            "support_requests",
+            search=search,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+    )
+
+
+@app.route("/support_requests/<request_id>/edit", methods=["GET", "POST"])
+def edit_support_request(request_id):
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "request_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    page = request.args.get("page", "1").strip()
+    per_page = request.args.get("per_page", "10").strip()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # -----------------------------------
+    # GET - Show Edit Form
+    # -----------------------------------
+
+    if request.method == "GET":
+
+        cursor.execute(
+            """
+            SELECT request_id,
+                   issue_type,
+                   description,
+                   status,
+                   created_date
+            FROM support_requests
+            WHERE request_id = %s
+            """,
+            (request_id,),
+        )
+
+        support_request = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        if not support_request:
+            return "Support Request not found", 404
+
+        return render_template(
+            "edit_support_request.html",
+            support_request=support_request,
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # POST - Get updated values
+    # -----------------------------------
+
+    issue_type = request.form.get("issue_type", "").strip()
+    description = request.form.get("description", "").strip()
+    new_status = request.form.get("status", "").strip()
+    created_date = request.form.get("created_date", "").strip()
+
+    # -----------------------------------
+    # Get preserved state from hidden fields
+    # -----------------------------------
+
+    search = request.form.get("search", search)
+    status_filter = request.form.get("status_filter", status_filter)
+    sort_by = request.form.get("sort_by", sort_by)
+    sort_order = request.form.get("sort_order", sort_order)
+    page = request.form.get("page", page)
+    per_page = request.form.get("per_page", per_page)
+
+    # -----------------------------------
+    # Validation
+    # -----------------------------------
+
+    if not issue_type or not description or not new_status or not created_date:
+
+        cursor.execute(
+            """
+            SELECT request_id,
+                   issue_type,
+                   description,
+                   status,
+                   created_date
+            FROM support_requests
+            WHERE request_id = %s
+            """,
+            (request_id,),
+        )
+
+        support_request = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            "edit_support_request.html",
+            support_request=support_request,
+            error="All fields are required.",
+            search=search,
+            status_filter=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+
+    # -----------------------------------
+    # Update database
+    # -----------------------------------
+
+    cursor.execute(
+        """
+        UPDATE support_requests
+        SET issue_type = %s,
+            description = %s,
+            status = %s,
+            created_date = %s
+        WHERE request_id = %s
+        """,
+        (
+            issue_type,
+            description,
+            new_status,
+            created_date,
+            request_id,
+        ),
+    )
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    # -----------------------------------
+    # Return to same filtered/sorted page
+    # -----------------------------------
+
+    return redirect(
+        url_for(
+            "support_requests",
+            search=search,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+    )
+
+
+@app.route("/support_requests/<request_id>/delete", methods=["POST"])
+def delete_support_request(request_id):
+
+    # -----------------------------------
+    # Preserve filter / sort parameters
+    # -----------------------------------
+
+    search = request.args.get("search", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    sort_by = request.args.get("sort_by", "request_id").strip()
+    sort_order = request.args.get("sort_order", "asc").strip()
+    page = request.args.get("page", "1").strip()
+    per_page = request.args.get("per_page", "10").strip()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # -----------------------------------
+    # Delete support request
+    # -----------------------------------
+
+    cursor.execute(
+        """
+        DELETE FROM support_requests
+        WHERE request_id = %s
+        """,
+        (request_id,),
+    )
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    # -----------------------------------
+    # Return to same filtered/sorted page
+    # -----------------------------------
+
+    return redirect(
+        url_for(
+            "support_requests",
+            search=search,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page,
+        )
+    )
+
+
 @app.route("/support_requests/export/csv")
 def export_support_requests_csv():
 

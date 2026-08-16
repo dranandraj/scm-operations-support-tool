@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Support Request{% endblock %}
+
+{% block content %}
+
+<h1>Edit Support Request</h1>
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% endif %}
+
+<form method="POST">
+
+    <input type="hidden" name="search" value="{{ search or '' }}">
+    <input type="hidden" name="status_filter" value="{{ status_filter or '' }}">
+    <input type="hidden" name="sort_by" value="{{ sort_by or 'request_id' }}">
+    <input type="hidden" name="sort_order" value="{{ sort_order or 'asc' }}">
+    <input type="hidden" name="page" value="{{ page or '1' }}">
+    <input type="hidden" name="per_page" value="{{ per_page or '10' }}">
+
+    <div class="mb-3">
+        <label for="request_id">Request ID</label>
+
+        <input type="text" id="request_id" name="request_id" class="form-control" value="{{ support_request[0] }}"
+            readonly>
+    </div>
+
+    <div class="mb-3">
+        <label for="issue_type">Issue Type</label>
+
+        <input type="text" id="issue_type" name="issue_type" class="form-control" value="{{ support_request[1] }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="description">Description</label>
+
+        <textarea id="description" name="description" class="form-control" rows="5">{{ support_request[2] }}</textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="status">Status</label>
+
+        <select id="status" name="status" class="form-select">
+
+            <option value="">Select Status</option>
+
+            <option value="Open" {% if support_request[3]=="Open" %}selected{% endif %}>
+                Open
+            </option>
+
+            <option value="In Progress" {% if support_request[3]=="In Progress" %}selected{% endif %}>
+                In Progress
+            </option>
+
+            <option value="Resolved" {% if support_request[3]=="Resolved" %}selected{% endif %}>
+                Resolved
+            </option>
+
+            <option value="Closed" {% if support_request[3]=="Closed" %}selected{% endif %}>
+                Closed
+            </option>
+
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="created_date">Created Date</label>
+
+        <input type="date" id="created_date" name="created_date" class="form-control" value="{{ support_request[4] }}">
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Update Support Request
+    </button>
+
+    <a href="{{ url_for(
+            'support_requests',
+            search=search,
+            status=status_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page
+        ) }}" class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>
+
+{% endblock %}
