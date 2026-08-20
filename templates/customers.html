@@ -4,19 +4,25 @@
 
 {% block content %}
 
+{% if message %}
+<div class="alert alert-{{ message_type }} mb-3">
+    {{ message }}
+</div>
+{% endif %}
+
 <h1 class="mb-4">Customers</h1>
 
 <!-- =========================
      Search / Filter / Sort Form
      ========================= -->
 
-<form method="GET" action="{{ url_for('customers') }}">
+<form method="GET" action="{{ url_for('customers') }}" class="customer-filter-form">
 
-    <div class="row g-2 mb-3">
+    <div class="customer-filter-row">
 
         <!-- Search -->
 
-        <div class="col-md-4">
+        <div>
 
             <input type="text" name="search" class="form-control"
                 placeholder="Search by Customer ID, Name, Country or Status" value="{{ search }}">
@@ -26,7 +32,7 @@
 
         <!-- Country Filter -->
 
-        <div class="col-md-2">
+        <div>
 
             <select name="country" class="form-select">
 
@@ -57,7 +63,7 @@
 
         <!-- Status Filter -->
 
-        <div class="col-md-2">
+        <div>
 
             <select name="status" class="form-select">
 
@@ -80,7 +86,7 @@
 
         <!-- Sort By -->
 
-        <div class="col-md-2">
+        <div>
 
             <select name="sort_by" class="form-select">
 
@@ -107,7 +113,7 @@
 
         <!-- Sort Order -->
 
-        <div class="col-md-2">
+        <div>
 
             <select name="sort_order" class="form-select">
 

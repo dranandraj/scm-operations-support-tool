@@ -29,42 +29,64 @@
 
 <body>
 
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="/">SCM Operations Support Tool</a>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
 
-        <div>
-            <a class="btn btn-outline-light btn-sm" href="/">Dashboard</a>
-            <a class="btn btn-outline-light btn-sm" href="/customers">Customers</a>
-            <a class="btn btn-outline-light btn-sm" href="/materials">Materials</a>
-            <a class="btn btn-outline-light btn-sm" href="/sales_orders">Sales Orders</a>
-            <a class="btn btn-outline-light btn-sm" href="/support_requests">Support Requests</a>
+            <a class="navbar-brand" href="/">
+                SCM Operations Support Tool
+            </a>
+
+            {% if session.get("logged_in") %}
+            <div>
+                <a class="btn btn-outline-light btn-sm" href="/">Dashboard</a>
+                <a class="btn btn-outline-light btn-sm" href="/customers">Customers</a>
+                <a class="btn btn-outline-light btn-sm" href="/materials">Materials</a>
+                <a class="btn btn-outline-light btn-sm" href="/sales_orders">Sales Orders</a>
+                <a class="btn btn-outline-light btn-sm" href="/support_requests">Support Requests</a>
+                <a class="btn btn-outline-light btn-sm" href="/logout">Logout</a>
+            </div>
+            {% endif %}
+
         </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        {% block content %}
+        {% endblock %}
+
     </div>
-</nav>
 
-<div class="container mt-4">
+    <script>
+        function changePageSize(value) {
 
-    {% block content %}
-    {% endblock %}
+            const url = new URL(window.location.href);
 
-</div>
+            // Change rows per page
+            url.searchParams.set("per_page", value);
 
-<script>
-    function changePageSize(value) {
+            // When page size changes, go back to page 1
+            url.searchParams.set("page", "1");
 
-        const url = new URL(window.location.href);
+            // Reload page
+            window.location.href = url.toString();
+        }
+    </script>
 
-        // Change rows per page
-        url.searchParams.set("per_page", value);
+    <script>
+        window.addEventListener("pageshow", function (event) {
 
-        // When page size changes, go back to page 1
-        url.searchParams.set("page", "1");
+            if (event.persisted) {
+                window.location.reload();
+            }
 
-        // Reload page
-        window.location.href = url.toString();
-    }
-</script>
+        });
+
+        window.addEventListener("popstate", function () {
+            window.location.reload();
+        });
+    </script>
 
 </body>
+
 </html>

@@ -1,6 +1,7 @@
 import io
 import csv
 import openpyxl
+import psycopg2
 from openpyxl import Workbook
 from flask import (
     Flask,
@@ -11,10 +12,72 @@ from flask import (
     redirect,
     url_for,
     Response,
+    session,
+    flash,
 )
 from modules.db import get_connection
 
 app = Flask(__name__)
+app.secret_key = "scm-support-tool-secret-key"
+
+
+@app.before_request
+def require_login():
+
+    allowed_routes = ["login"]
+
+    if request.endpoint in allowed_routes:
+        return
+
+    if request.path.startswith("/static/"):
+        return
+
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+
+
+@app.after_request
+def add_no_cache_headers(response):
+
+    if not request.path.startswith("/static/"):
+        response.headers["Cache-Control"] = (
+            "no-store, no-cache, must-revalidate, max-age=0"
+        )
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+
+    return response
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if session.get("logged_in"):
+        return redirect(url_for("home"))
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
+
+        if username == "admin" and password == "admin123":
+            session["logged_in"] = True
+            session["username"] = username
+
+            return redirect(url_for("home"))
+
+        return render_template(
+            "login.html", error="Invalid username or password.", username=username
+        )
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect(url_for("login"))
 
 
 @app.route("/")
@@ -114,6 +177,11 @@ def home():
     )
 
 
+# ============================================================
+# CUSTOMERS
+# ============================================================
+
+
 @app.route("/customers")
 def customers():
 
@@ -122,6 +190,10 @@ def customers():
     status = request.args.get("status", "").strip()
     sort_by = request.args.get("sort_by", "customer_id")
     sort_order = request.args.get("sort_order", "asc")
+
+    # Message from create / edit / delete
+    message = request.args.get("message", "").strip()
+    message_type = request.args.get("message_type", "success").strip()
 
     # Pagination
     page = request.args.get("page", 1, type=int)
@@ -153,7 +225,10 @@ def customers():
     connection = get_connection()
     cursor = connection.cursor()
 
+    # --------------------------------------------------------
     # Main query
+    # --------------------------------------------------------
+
     query = """
         SELECT customer_id,
                customer_name,
@@ -188,7 +263,10 @@ def customers():
         query += " AND status = %s"
         params.append(status)
 
+    # --------------------------------------------------------
     # Count filtered records
+    # --------------------------------------------------------
+
     count_query = """
         SELECT COUNT(*)
         FROM customers
@@ -226,7 +304,10 @@ def customers():
 
     total_records = cursor.fetchone()[0]
 
-    # Calculate total pages
+    # --------------------------------------------------------
+    # Pagination calculation
+    # --------------------------------------------------------
+
     total_pages = max(1, (total_records + per_page - 1) // per_page)
 
     # Prevent invalid page number
@@ -236,7 +317,10 @@ def customers():
     # Calculate offset
     offset = (page - 1) * per_page
 
+    # --------------------------------------------------------
     # Sorting + Pagination
+    # --------------------------------------------------------
+
     query += f"""
         ORDER BY {order_column} {order_direction}
         LIMIT %s OFFSET %s
@@ -251,6 +335,10 @@ def customers():
     cursor.close()
     connection.close()
 
+    # --------------------------------------------------------
+    # Render Customers page
+    # --------------------------------------------------------
+
     return render_template(
         "customers.html",
         customers=customers,
@@ -264,7 +352,15 @@ def customers():
         total_records=total_records,
         total_pages=total_pages,
         current_endpoint="customers",
+        # Delete / action message
+        message=message,
+        message_type=message_type,
     )
+
+
+# ============================================================
+# CREATE CUSTOMER
+# ============================================================
 
 
 @app.route("/customers/create", methods=["GET", "POST"])
@@ -387,6 +483,8 @@ def create_customer():
                 sort_order=sort_order,
                 per_page=per_page,
                 page=page,
+                message=f"Customer {customer_id} created successfully.",
+                message_type="success",
             )
         )
 
@@ -404,6 +502,11 @@ def create_customer():
         per_page=per_page,
         page=page,
     )
+
+
+# ============================================================
+# EDIT CUSTOMER
+# ============================================================
 
 
 @app.route("/customers/<customer_id>/edit", methods=["GET", "POST"])
@@ -438,7 +541,7 @@ def edit_customer(customer_id):
                    status
             FROM customers
             WHERE customer_id = %s
-        """,
+            """,
             (customer_id,),
         )
 
@@ -470,7 +573,10 @@ def edit_customer(customer_id):
     new_country = request.form.get("country", "").strip()
     new_status = request.form.get("status", "").strip()
 
+    # -----------------------------------
     # Validation
+    # -----------------------------------
+
     if not customer_name or not new_country or not new_status:
 
         cursor.execute(
@@ -481,7 +587,7 @@ def edit_customer(customer_id):
                    status
             FROM customers
             WHERE customer_id = %s
-        """,
+            """,
             (customer_id,),
         )
 
@@ -514,8 +620,13 @@ def edit_customer(customer_id):
             country = %s,
             status = %s
         WHERE customer_id = %s
-    """,
-        (customer_name, new_country, new_status, customer_id),
+        """,
+        (
+            customer_name,
+            new_country,
+            new_status,
+            customer_id,
+        ),
     )
 
     connection.commit()
@@ -537,8 +648,15 @@ def edit_customer(customer_id):
             sort_order=sort_order,
             per_page=per_page,
             page=page,
+            message=f"Customer {customer_id} updated successfully.",
+            message_type="success",
         )
     )
+
+
+# ============================================================
+# DELETE CUSTOMER
+# ============================================================
 
 
 @app.route("/customers/<customer_id>/delete", methods=["POST"])
@@ -559,18 +677,54 @@ def delete_customer(customer_id):
     connection = get_connection()
     cursor = connection.cursor()
 
-    cursor.execute(
-        """
-        DELETE FROM customers
-        WHERE customer_id = %s
-    """,
-        (customer_id,),
-    )
+    try:
 
-    connection.commit()
+        # -----------------------------------
+        # Delete customer
+        # -----------------------------------
 
-    cursor.close()
-    connection.close()
+        cursor.execute(
+            """
+            DELETE FROM customers
+            WHERE customer_id = %s
+            """,
+            (customer_id,),
+        )
+
+        connection.commit()
+
+        message = f"Customer {customer_id} deleted successfully."
+        message_type = "success"
+
+    except Exception as e:
+
+        # -----------------------------------
+        # Rollback failed transaction
+        # -----------------------------------
+
+        connection.rollback()
+
+        # -----------------------------------
+        # Foreign Key violation
+        # -----------------------------------
+
+        if "ForeignKeyViolation" in type(e).__name__:
+
+            message = (
+                f"Customer {customer_id} cannot be deleted "
+                "because it is referenced by existing sales orders."
+            )
+
+        else:
+
+            message = f"Unable to delete customer {customer_id}. " "Please try again."
+
+        message_type = "danger"
+
+    finally:
+
+        cursor.close()
+        connection.close()
 
     # -----------------------------------
     # Return to same filtered/sorted page
@@ -586,6 +740,8 @@ def delete_customer(customer_id):
             sort_order=sort_order,
             per_page=per_page,
             page=page,
+            message=message,
+            message_type=message_type,
         )
     )
 
@@ -1090,6 +1246,8 @@ def create_material():
 
         connection.commit()
 
+        flash(f"Material {material_id} created successfully.", "success")
+
         cursor.close()
         connection.close()
 
@@ -1301,6 +1459,8 @@ def edit_material(material_id):
 
     connection.commit()
 
+    flash(f"Material {material_id} updated successfully.", "success")
+
     cursor.close()
     connection.close()
 
@@ -1344,19 +1504,43 @@ def delete_material(material_id):
     connection = get_connection()
     cursor = connection.cursor()
 
-    # Delete material
-    cursor.execute(
-        """
-        DELETE FROM materials
-        WHERE material_id = %s
-        """,
-        (material_id,),
-    )
+    try:
 
-    connection.commit()
+        # -----------------------------------
+        # Delete material
+        # -----------------------------------
 
-    cursor.close()
-    connection.close()
+        cursor.execute(
+            """
+            DELETE FROM materials
+            WHERE material_id = %s
+            """,
+            (material_id,),
+        )
+
+        connection.commit()
+
+        # Success notification
+        flash(f"Material {material_id} deleted successfully.", "success")
+
+    except psycopg2.errors.ForeignKeyViolation:
+
+        # -----------------------------------
+        # Material is referenced by Sales Orders
+        # -----------------------------------
+
+        connection.rollback()
+
+        # Error notification
+        flash(
+            f"Material {material_id} cannot be deleted because it is referenced by existing sales orders.",
+            "danger",
+        )
+
+    finally:
+
+        cursor.close()
+        connection.close()
 
     # -----------------------------------
     # Return to same filtered/sorted page
@@ -1635,7 +1819,8 @@ def sales_orders():
 
     search = request.args.get("search", "").strip()
     status = request.args.get("status", "").strip()
-
+    message = request.args.get("message", "").strip()
+    message_type = request.args.get("message_type", "success").strip()
     sort_by = request.args.get("sort_by", "order_id")
     sort_order = request.args.get("sort_order", "asc")
 
@@ -1908,9 +2093,17 @@ def create_sales_order():
 
             connection.commit()
 
+            flash(f"Sales Order {order_id} created successfully.", "success")
+
         except Exception as e:
 
             connection.rollback()
+
+            error_message = str(e)
+
+            # Friendly message for duplicate Sales Order ID
+            if "sales_orders_pkey" in error_message:
+                error_message = "Sales Order ID already exists."
 
             cursor.close()
             connection.close()
@@ -1919,7 +2112,7 @@ def create_sales_order():
                 "sales_order_form.html",
                 customers=customers,
                 materials=materials,
-                error=str(e),
+                error=error_message,
                 order_id=order_id,
                 customer_id=customer_id,
                 material_id=material_id,
@@ -2339,6 +2532,8 @@ def edit_sales_order(order_id):
 
     connection.commit()
 
+    flash(f"Sales Order {order_id} updated successfully.", "success")
+
     cursor.close()
     connection.close()
 
@@ -2376,22 +2571,38 @@ def delete_sales_order(order_id):
     connection = get_connection()
     cursor = connection.cursor()
 
-    # -----------------------------------
-    # Delete sales order
-    # -----------------------------------
+    try:
 
-    cursor.execute(
-        """
-        DELETE FROM sales_orders
-        WHERE order_id = %s
-        """,
-        (order_id,),
-    )
+        # -----------------------------------
+        # Delete sales order
+        # -----------------------------------
 
-    connection.commit()
+        cursor.execute(
+            """
+            DELETE FROM sales_orders
+            WHERE order_id = %s
+            """,
+            (order_id,),
+        )
 
-    cursor.close()
-    connection.close()
+        connection.commit()
+
+        flash(f"Sales Order {order_id} deleted successfully.", "success")
+
+    except Exception as e:
+
+        connection.rollback()
+
+        # -----------------------------------
+        # Handle delete error
+        # -----------------------------------
+
+        flash(f"Sales Order {order_id} could not be deleted: {str(e)}", "danger")
+
+    finally:
+
+        cursor.close()
+        connection.close()
 
     # -----------------------------------
     # Return to same filtered/sorted page
@@ -2993,6 +3204,8 @@ def create_support_request():
 
     connection.commit()
 
+    flash(f"Support Request {request_id} created successfully.", "success")
+
     # -----------------------------------
     # Return to same filtered/sorted page
     # -----------------------------------
@@ -3145,6 +3358,8 @@ def edit_support_request(request_id):
 
     connection.commit()
 
+    flash(f"Support Request {request_id} updated successfully.", "success")
+
     cursor.close()
     connection.close()
 
@@ -3195,6 +3410,8 @@ def delete_support_request(request_id):
     )
 
     connection.commit()
+
+    flash(f"Support Request {request_id} deleted successfully.", "success")
 
     cursor.close()
     connection.close()
@@ -3466,6 +3683,16 @@ def export_support_requests_excel():
         as_attachment=True,
         download_name="support_requests.xlsx",
     )
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return render_template("500.html"), 500
 
 
 if __name__ == "__main__":

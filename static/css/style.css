@@ -630,3 +630,293 @@ form a.btn:hover {
 form {
     max-width: 800px;
 }
+
+/* ===================================
+   Login Page
+   =================================== */
+
+.login-page {
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 35px;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    font-size: 1.7rem;
+    margin-bottom: 8px;
+    color: #212529;
+}
+
+.login-header p {
+    margin-bottom: 0;
+    color: #6c757d;
+}
+
+.login-card .form-control {
+    min-height: 44px;
+    border-radius: 6px;
+}
+
+.login-card .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+}
+
+.login-card .btn {
+    min-height: 44px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.login-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* Login page polish */
+.login-card {
+    max-width: 560px;
+    margin: 70px auto;
+    padding: 48px;
+    border-radius: 14px;
+}
+
+.login-header {
+    margin-bottom: 32px;
+}
+
+.login-header h1 {
+    line-height: 1.2;
+}
+
+.login-header p {
+    margin-top: 16px;
+}
+
+.login-card .form-control {
+    padding: 12px 14px;
+    font-size: 1rem;
+}
+
+.login-card .btn-primary {
+    padding: 12px;
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+.login-card .alert {
+    margin-bottom: 24px;
+}
+
+/* Filter / Search Controls Alignment */
+.filter-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px;
+    flex-wrap: nowrap !important;
+    width: 100%;
+}
+
+/* Search box */
+.filter-row input {
+    width: 500px !important;
+    min-width: 380px !important;
+    max-width: 500px !important;
+    height: 50px;
+    box-sizing: border-box;
+    margin: 0;
+    flex: 0 1 500px !important;
+}
+
+/* Status + Sort field dropdowns */
+.filter-row select {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+    height: 50px;
+    box-sizing: border-box;
+    margin: 0;
+    flex: 0 0 220px !important;
+}
+
+/* Ascending / Descending dropdown */
+.filter-row .sort-order {
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+    flex: 0 0 180px !important;
+}
+
+/* =========================================
+   CUSTOMER FILTER - FULL WIDTH
+   ========================================= */
+
+.customer-filter-form {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+}
+
+.customer-filter-form .customer-filter-row {
+    width: 100% !important;
+    max-width: none !important;
+
+    display: grid !important;
+    grid-template-columns: 2.2fr 1fr 1fr 1fr 0.9fr !important;
+
+    gap: 10px !important;
+    box-sizing: border-box !important;
+    margin-bottom: 16px !important;
+}
+
+.customer-filter-form .customer-filter-row>div {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.customer-filter-form .customer-filter-row input,
+.customer-filter-form .customer-filter-row select {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 50px !important;
+    box-sizing: border-box !important;
+}
+
+/* =========================================
+   CUSTOMERS FILTER ALIGNMENT
+   ========================================= */
+
+.customer-filter-form .customer-filter-row {
+    display: grid !important;
+    grid-template-columns: 2.2fr 1fr 1fr 1fr 0.9fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin-bottom: 16px !important;
+    box-sizing: border-box !important;
+}
+
+.customer-filter-form .customer-filter-row>div {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.customer-filter-form .customer-filter-row input,
+.customer-filter-form .customer-filter-row select {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 50px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+    .customer-filter-form .customer-filter-row {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .customer-filter-form .customer-filter-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* =========================================
+   MATERIALS FILTER - FULL WIDTH
+   ========================================= */
+
+form[action*="materials"] {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+form[action*="materials"] .row {
+    display: grid !important;
+
+    /* Search | Category | Plant | Status | Sort By | Sort Order */
+    grid-template-columns: 2.2fr 1.2fr 1.1fr 1.1fr 1.2fr 0.8fr !important;
+
+    gap: 10px !important;
+
+    width: 100% !important;
+    max-width: none !important;
+
+    margin: 0 0 16px 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Individual columns */
+form[action*="materials"] .row>div {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Search + dropdowns */
+form[action*="materials"] .row input,
+form[action*="materials"] .row select {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: 50px !important;
+
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+
+/* =========================================
+   MATERIALS FILTER - RESPONSIVE
+   ========================================= */
+
+@media (max-width: 1000px) {
+
+    form[action*="materials"] .row {
+        grid-template-columns: 1fr 1fr 1fr !important;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    form[action*="materials"] .row {
+        grid-template-columns: 1fr !important;
+    }
+
+}
