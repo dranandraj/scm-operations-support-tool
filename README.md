@@ -22,6 +22,17 @@ The application uses **Flask** for the backend, **PostgreSQL** for data storage,
 
 ---
 
+## 🚀 Live Demo / ライブデモ
+
+**Production Application / 本番アプリケーション:**  
+https://scm-operations-support-tool.onrender.com/
+
+> The application is deployed on Render and connected to PostgreSQL.
+>
+> Render上にデプロイされ、PostgreSQLデータベースに接続されています。
+
+---
+
 ## 2. Key Features
 
 ### Dashboard
