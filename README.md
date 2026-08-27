@@ -31,6 +31,16 @@ https://scm-operations-support-tool.onrender.com/
 >
 > Render上にデプロイされ、PostgreSQLデータベースに接続されています。
 
+### 🔐 Demo Login / デモログイン
+
+**Demo Username / ユーザー名:** `admin`
+
+**Demo Password / パスワード:** `admin123`
+
+> Use the demo credentials above to access the application.
+>
+> 上記のデモ用認証情報を使用してアプリケーションにログインできます。
+
 ---
 
 ## 2. Key Features
