@@ -18,7 +18,7 @@ from flask import (
 from modules.db import get_connection
 
 app = Flask(__name__)
-app.secret_key = "scm-support-tool-secret-key"
+app.secret_key = "business-operations-management-secret-key"
 
 
 @app.before_request
