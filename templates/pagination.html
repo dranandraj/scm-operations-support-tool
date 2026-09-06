@@ -4,28 +4,74 @@
 
     <ul class="pagination justify-content-center">
 
+        <!-- ============================= -->
         <!-- Previous -->
+        <!-- ============================= -->
 
         <li class="page-item {% if page == 1 %}disabled{% endif %}">
 
             {% if page > 1 %}
 
-            <a
-                class="page-link"
-                href="{{ url_for(
-                    request.endpoint,
-                    search=search,
-                    category=category,
-                    plant=plant,
-                    status=status,
-                    sort_by=sort_by,
-                    sort_order=sort_order,
-                    per_page=per_page,
-                    page=page-1
-                ) }}"
-            >
+            {% if request.endpoint == "customers" %}
+
+            <a class="page-link" href="{{ url_for(
+                        'customers',
+                        search=search,
+                        country=country,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order,
+                        per_page=per_page,
+                        page=page-1
+                    ) }}">
                 Previous
             </a>
+
+            {% elif request.endpoint == "materials" %}
+
+            <a class="page-link" href="{{ url_for(
+                        'materials',
+                        search=search,
+                        category=category,
+                        plant=plant,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order,
+                        per_page=per_page,
+                        page=page-1
+                    ) }}">
+                Previous
+            </a>
+
+            {% elif request.endpoint == "sales_orders" %}
+
+            <a class="page-link" href="{{ url_for(
+                        'sales_orders',
+                        search=search,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order,
+                        per_page=per_page,
+                        page=page-1
+                    ) }}">
+                Previous
+            </a>
+
+            {% elif request.endpoint == "support_requests" %}
+
+            <a class="page-link" href="{{ url_for(
+                        'support_requests',
+                        search=search,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order,
+                        per_page=per_page,
+                        page=page-1
+                    ) }}">
+                Previous
+            </a>
+
+            {% endif %}
 
             {% else %}
 
@@ -38,19 +84,33 @@
         </li>
 
 
+        <!-- ============================= -->
         <!-- Page Numbers -->
+        <!-- ============================= -->
 
         {% for page_number in range(1, total_pages + 1) %}
 
-        <li
-            class="page-item
-            {% if page_number == page %}active{% endif %}"
-        >
+        <li class="page-item {% if page_number == page %}active{% endif %}">
 
-            <a
-                class="page-link"
-                href="{{ url_for(
-                    request.endpoint,
+            {% if request.endpoint == "customers" %}
+
+            <a class="page-link" href="{{ url_for(
+                    'customers',
+                    search=search,
+                    country=country,
+                    status=status,
+                    sort_by=sort_by,
+                    sort_order=sort_order,
+                    per_page=per_page,
+                    page=page_number
+                ) }}">
+                {{ page_number }}
+            </a>
+
+            {% elif request.endpoint == "materials" %}
+
+            <a class="page-link" href="{{ url_for(
+                    'materials',
                     search=search,
                     category=category,
                     plant=plant,
@@ -59,49 +119,117 @@
                     sort_order=sort_order,
                     per_page=per_page,
                     page=page_number
-                ) }}"
-            >
+                ) }}">
                 {{ page_number }}
             </a>
+
+            {% elif request.endpoint == "sales_orders" %}
+
+            <a class="page-link" href="{{ url_for(
+                    'sales_orders',
+                    search=search,
+                    status=status,
+                    sort_by=sort_by,
+                    sort_order=sort_order,
+                    per_page=per_page,
+                    page=page_number
+                ) }}">
+                {{ page_number }}
+            </a>
+
+            {% elif request.endpoint == "support_requests" %}
+
+            <a class="page-link" href="{{ url_for(
+                    'support_requests',
+                    search=search,
+                    status=status,
+                    sort_by=sort_by,
+                    sort_order=sort_order,
+                    per_page=per_page,
+                    page=page_number
+                ) }}">
+                {{ page_number }}
+            </a>
+
+            {% endif %}
 
         </li>
 
         {% endfor %}
 
 
+        <!-- ============================= -->
         <!-- Next -->
+        <!-- ============================= -->
 
-        <li
-            class="page-item
-            {% if page == total_pages %}disabled{% endif %}"
-        >
+        <li class="page-item {% if page == total_pages %}disabled{% endif %}">
 
-            {% if page < total_pages %}
-
-            <a
-                class="page-link"
-                href="{{ url_for(
-                    request.endpoint,
-                    search=search,
-                    category=category,
-                    plant=plant,
-                    status=status,
-                    sort_by=sort_by,
-                    sort_order=sort_order,
-                    per_page=per_page,
-                    page=page+1
-                ) }}"
-            >
+            {% if page < total_pages %} {% if request.endpoint=="customers" %} <a class="page-link" href="{{ url_for(
+                        'customers',
+                        search=search,
+                        country=country,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order,
+                        per_page=per_page,
+                        page=page+1
+                    ) }}">
                 Next
-            </a>
+                </a>
 
-            {% else %}
+                {% elif request.endpoint == "materials" %}
 
-            <span class="page-link">
-                Next
-            </span>
+                <a class="page-link" href="{{ url_for(
+                        'materials',
+                        search=search,
+                        category=category,
+                        plant=plant,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order,
+                        per_page=per_page,
+                        page=page+1
+                    ) }}">
+                    Next
+                </a>
 
-            {% endif %}
+                {% elif request.endpoint == "sales_orders" %}
+
+                <a class="page-link" href="{{ url_for(
+                        'sales_orders',
+                        search=search,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order,
+                        per_page=per_page,
+                        page=page+1
+                    ) }}">
+                    Next
+                </a>
+
+                {% elif request.endpoint == "support_requests" %}
+
+                <a class="page-link" href="{{ url_for(
+                        'support_requests',
+                        search=search,
+                        status=status,
+                        sort_by=sort_by,
+                        sort_order=sort_order,
+                        per_page=per_page,
+                        page=page+1
+                    ) }}">
+                    Next
+                </a>
+
+                {% endif %}
+
+                {% else %}
+
+                <span class="page-link">
+                    Next
+                </span>
+
+                {% endif %}
 
         </li>
 
